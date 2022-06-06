@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.github.ns2j</groupId>
+    <artifactId>loj</artifactId>
+    <version>1.0-SNAPSHOT</version> 
+  </parent>
+
+  <artifactId>loj-util</artifactId>
+  <name>loj-util</name>
+  <description>LibreOffice util</description>
+
+  <properties>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+      <version>2.9.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <executable>java</executable>
+          <arguments>
+            <argument>-classpath</argument>
+            <classpath />
+            <argument>-Djava.library.path=${lo.execfolder}</argument>
+            <argument>-Dlo.execFolder=${lo.execfolder}</argument>
+            <argument>${mainClass}</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <lo.execfolder>c:\Program Files\LibreOffice\program</lo.execfolder>
+      </properties>
+    </profile>
+    <profile>
+      <id>redhat</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+        </os>
+        <file>
+          <exists>/etc/redhat-release</exists>
+        </file>
+      </activation>
+      <properties>
+        <lo.execfolder>/usr/lib64/libreoffice/program</lo.execfolder>
+      </properties>
+    </profile>
+    <profile>
+      <id>debian</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+        </os>
+        <file>
+          <missing>/etc/redhat-release</missing>
+        </file>
+      </activation>
+      <properties>
+        <lo.execfolder>/usr/lib/libreoffice/program</lo.execfolder>
+      </properties>
+    </profile>
+  </profiles>
+</project>

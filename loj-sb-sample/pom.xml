@@ -1,0 +1,124 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.ns2j</groupId>
+  <artifactId>loj-sb-sample</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>loj-sb-sample</name>
+  <description>loj Spring Boot Sample</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+
+    <loj.version>1.0-SNAPSHOT</loj.version>
+
+    <mainClass>loj.sb.DemoApplication</mainClass>
+    <start-class>${mainClass}</start-class>
+  </properties>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.7.0</version>
+    <relativePath></relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.ns2j</groupId>
+      <artifactId>loj-util</artifactId>
+      <version>${loj.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.ns2j</groupId>
+      <artifactId>loj-proxy</artifactId>
+      <version>${loj.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <executions>
+          <execution>
+            <id>sb</id>
+            <configuration>
+              <executable>java</executable>
+              <arguments>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>-Djava.library.path=${lo.execFolder}</argument>
+                <argument>-Dlo.execFolder=${lo.execFolder}</argument>
+                <argument>${mainClass}</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <lo.execFolder>c:\Program Files\LibreOffice\program</lo.execFolder>
+      </properties>
+    </profile>
+    <profile>
+      <id>redhat</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+        </os>
+        <file>
+          <exists>/etc/redhat-release</exists>
+        </file>
+      </activation>
+      <properties>
+        <lo.execFolder>/usr/lib64/libreoffice/program</lo.execFolder>
+      </properties>
+    </profile>
+    <profile>
+      <id>debian</id>
+      <activation>
+        <os>
+          <family>Linux</family>
+        </os>
+        <file>
+          <missing>/etc/redhat-release</missing>
+        </file>
+      </activation>
+      <properties>
+        <lo.execFolder>/usr/lib/libreoffice/program</lo.execFolder>
+      </properties>
+    </profile>
+  </profiles>
+</project>
