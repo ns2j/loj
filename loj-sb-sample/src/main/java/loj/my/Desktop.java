@@ -34,13 +34,13 @@ public class Desktop extends P_Desktop {
         is.close();
 
         LoInputStream loIs= new LoInputStream(bytes.toByteArray());
-//        var pvs = Util.getPropertyValueArray(Map.of(
-  //              "InputStream", loIs,
-    //            "Hidden", Boolean.TRUE));
-        //return new Doc(loadComponentFromURL("private:stream", "_blank", 0, pvs));
         var pvs = Util.getPropertyValueArray(Map.of(
+                "InputStream", loIs,
                 "Hidden", Boolean.TRUE));
-        return new Doc(loadComponentFromURL("" + new File("test.ods").toURI(), "_blank", 0, pvs));
+        return new Doc(loadComponentFromURL("private:stream", "_blank", 0, pvs));
+       // var pvs = Util.getPropertyValueArray(Map.of(
+        //        "Hidden", Boolean.TRUE));
+        //return new Doc(loadComponentFromURL("" + new File("test.ods").toURI(), "_blank", 0, pvs));
     }
     
     public Doc getNewDoc() throws IllegalArgumentException, IOException, com.sun.star.io.IOException  {
