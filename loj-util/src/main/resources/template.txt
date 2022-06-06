@@ -1,0 +1,29 @@
+__PACKAGE__
+
+__IMPORTS__
+import com.sun.star.uno.UnoRuntime;
+import loj.proxy.Proxiable;
+
+public class __CLASS__ implements Proxiable, __IMPLEMENTS__ {
+    protected Object proxy;
+
+    public __CLASS__(Object object) {this.proxy = object;}
+
+    public __CLASS__ qi(Object object) {
+        return UnoRuntime.queryInterface(getClass(), object);
+    }
+
+    public <S> S qi(Class<S> zInterface) {
+        return UnoRuntime.queryInterface(zInterface, proxy);
+    }
+    public <S> S qi(Class<S> zInterface, Object object) {
+        if (object instanceof Proxiable)
+            return UnoRuntime.queryInterface(zInterface, ((Proxiable)object).getProxy());
+        return UnoRuntime.queryInterface(zInterface, object);
+    }
+
+    @Override public Object getProxy() {return proxy;}
+__PROPERTYSET__
+__METHODS__
+}
+    
