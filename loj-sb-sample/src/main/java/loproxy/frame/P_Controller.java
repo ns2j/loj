@@ -78,7 +78,7 @@ import com.sun.star.view.XSelectionSupplier;
 import com.sun.star.uno.UnoRuntime;
 import loj.proxy.Proxiable;
 
-public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeReferrer, XStatusIndicatorSupplier, XTitle, XUserInputInterception, XTitleChangeBroadcaster, XPropertySet, XUnoTunnel, XRangeSelection, XController2, XViewSplitable, XContextMenuInterception, XInitialization, XControllerBorder, XActivationBroadcaster, XWeak, XInfobarProvider, XViewFreezable, XEnumerationAccess, XServiceInfo, XDispatchInformationProvider, XEnhancedMouseClickBroadcaster, XViewPane, XFormLayerAccess, XIndexAccess, XSpreadsheetView, XTypeProvider, XTransferableSupplier, XSelectionSupplier {
+public class P_Controller implements Proxiable, XServiceInfo, XFormLayerAccess, XTitle, XViewSplitable, XInfobarProvider, XViewPane, XCellRangeReferrer, XUserInputInterception, XTypeProvider, XViewFreezable, XSpreadsheetView, XTitleChangeBroadcaster, XPropertySet, XEnumerationAccess, XActivationBroadcaster, XRangeSelection, XController2, XInitialization, XControllerBorder, XDispatchProvider, XEnhancedMouseClickBroadcaster, XContextMenuInterception, XWeak, XIndexAccess, XSelectionSupplier, XUnoTunnel, XStatusIndicatorSupplier, XDispatchInformationProvider, XTransferableSupplier {
     protected Object proxy;
 
     public P_Controller(Object object) {this.proxy = object;}
@@ -103,32 +103,63 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
         return this;
     }
 
-    @Override public XDispatch queryDispatch (URL arg0, String arg1, int arg2)  {return qi(XDispatchProvider.class, proxy).queryDispatch(arg0, arg1, arg2);}
-    @Override public XDispatch[] queryDispatches (DispatchDescriptor[] arg0)  {return qi(XDispatchProvider.class, proxy).queryDispatches(arg0);}
-    @Override public XCellRange getReferredCells ()  {return qi(XCellRangeReferrer.class, proxy).getReferredCells();}
-    @Override public XStatusIndicator getStatusIndicator ()  {return qi(XStatusIndicatorSupplier.class, proxy).getStatusIndicator();}
-    @Override public void setTitle (String arg0)  {qi(XTitle.class, proxy).setTitle(arg0);}
+    @Override public String getImplementationName ()  {return qi(XServiceInfo.class, proxy).getImplementationName();}
+    @Override public String[] getSupportedServiceNames ()  {return qi(XServiceInfo.class, proxy).getSupportedServiceNames();}
+    @Override public boolean supportsService (String arg0)  {return qi(XServiceInfo.class, proxy).supportsService(arg0);}
+    @Override public boolean isFormDesignMode ()  {return qi(XFormLayerAccess.class, proxy).isFormDesignMode();}
+    @Override public void setFormDesignMode (boolean arg0)  {qi(XFormLayerAccess.class, proxy).setFormDesignMode(arg0);}
+    @Override public XFormController getFormController (XForm arg0)  {return qi(XFormLayerAccess.class, proxy).getFormController(
+            arg0 instanceof Proxiable ? qi(XForm.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
+    @Override public XControl getControl (XControlModel arg0) throws NoSuchElementException  {return qi(XFormLayerAccess.class, proxy).getControl(
+            arg0 instanceof Proxiable ? qi(XControlModel.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
     @Override public String getTitle ()  {return qi(XTitle.class, proxy).getTitle();}
+    @Override public void setTitle (String arg0)  {qi(XTitle.class, proxy).setTitle(arg0);}
+    @Override public boolean getIsWindowSplit ()  {return qi(XViewSplitable.class, proxy).getIsWindowSplit();}
+    @Override public int getSplitHorizontal ()  {return qi(XViewSplitable.class, proxy).getSplitHorizontal();}
+    @Override public int getSplitVertical ()  {return qi(XViewSplitable.class, proxy).getSplitVertical();}
+    @Override public int getSplitColumn ()  {return qi(XViewSplitable.class, proxy).getSplitColumn();}
+    @Override public int getSplitRow ()  {return qi(XViewSplitable.class, proxy).getSplitRow();}
+    @Override public void splitAtPosition (int arg0, int arg1)  {qi(XViewSplitable.class, proxy).splitAtPosition(arg0, arg1);}
+    @Override public boolean hasInfobar (String arg0)  {return qi(XInfobarProvider.class, proxy).hasInfobar(arg0);}
+    @Override public void appendInfobar (String arg0, String arg1, String arg2, int arg3, StringPair[] arg4, boolean arg5) throws IllegalArgumentException  {qi(XInfobarProvider.class, proxy).appendInfobar(arg0, arg1, arg2, arg3, arg4, arg5);}
+    @Override public void updateInfobar (String arg0, String arg1, String arg2, int arg3) throws NoSuchElementException  {qi(XInfobarProvider.class, proxy).updateInfobar(arg0, arg1, arg2, arg3);}
+    @Override public void removeInfobar (String arg0) throws NoSuchElementException  {qi(XInfobarProvider.class, proxy).removeInfobar(arg0);}
+    @Override public int getFirstVisibleRow ()  {return qi(XViewPane.class, proxy).getFirstVisibleRow();}
+    @Override public void setFirstVisibleRow (int arg0)  {qi(XViewPane.class, proxy).setFirstVisibleRow(arg0);}
+    @Override public void setFirstVisibleColumn (int arg0)  {qi(XViewPane.class, proxy).setFirstVisibleColumn(arg0);}
+    @Override public CellRangeAddress getVisibleRange ()  {return qi(XViewPane.class, proxy).getVisibleRange();}
+    @Override public int getFirstVisibleColumn ()  {return qi(XViewPane.class, proxy).getFirstVisibleColumn();}
+    @Override public XCellRange getReferredCells ()  {return qi(XCellRangeReferrer.class, proxy).getReferredCells();}
     @Override public void addKeyHandler (XKeyHandler arg0)  {qi(XUserInputInterception.class, proxy).addKeyHandler(
             arg0 instanceof Proxiable ? qi(XKeyHandler.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
     @Override public void removeKeyHandler (XKeyHandler arg0)  {qi(XUserInputInterception.class, proxy).removeKeyHandler(
             arg0 instanceof Proxiable ? qi(XKeyHandler.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public void removeMouseClickHandler (XMouseClickHandler arg0)  {qi(XUserInputInterception.class, proxy).removeMouseClickHandler(
-            arg0 instanceof Proxiable ? qi(XMouseClickHandler.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
     @Override public void addMouseClickHandler (XMouseClickHandler arg0)  {qi(XUserInputInterception.class, proxy).addMouseClickHandler(
             arg0 instanceof Proxiable ? qi(XMouseClickHandler.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public void removeTitleChangeListener (XTitleChangeListener arg0)  {qi(XTitleChangeBroadcaster.class, proxy).removeTitleChangeListener(
-            arg0 instanceof Proxiable ? qi(XTitleChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
+    @Override public void removeMouseClickHandler (XMouseClickHandler arg0)  {qi(XUserInputInterception.class, proxy).removeMouseClickHandler(
+            arg0 instanceof Proxiable ? qi(XMouseClickHandler.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
+    @Override public Type[] getTypes ()  {return qi(XTypeProvider.class, proxy).getTypes();}
+    @Override public byte[] getImplementationId ()  {return qi(XTypeProvider.class, proxy).getImplementationId();}
+    @Override public void freezeAtPosition (int arg0, int arg1)  {qi(XViewFreezable.class, proxy).freezeAtPosition(arg0, arg1);}
+    @Override public boolean hasFrozenPanes ()  {return qi(XViewFreezable.class, proxy).hasFrozenPanes();}
+    @Override public XSpreadsheet getActiveSheet ()  {return qi(XSpreadsheetView.class, proxy).getActiveSheet();}
+    @Override public void setActiveSheet (XSpreadsheet arg0)  {qi(XSpreadsheetView.class, proxy).setActiveSheet(
+            arg0 instanceof Proxiable ? qi(XSpreadsheet.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
     @Override public void addTitleChangeListener (XTitleChangeListener arg0)  {qi(XTitleChangeBroadcaster.class, proxy).addTitleChangeListener(
             arg0 instanceof Proxiable ? qi(XTitleChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public XPropertySetInfo getPropertySetInfo ()  {return qi(XPropertySet.class, proxy).getPropertySetInfo();}
+    @Override public void removeTitleChangeListener (XTitleChangeListener arg0)  {qi(XTitleChangeBroadcaster.class, proxy).removeTitleChangeListener(
+            arg0 instanceof Proxiable ? qi(XTitleChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
     @Override public void setPropertyValue (String arg0, Object arg1) throws UnknownPropertyException, PropertyVetoException, IllegalArgumentException, WrappedTargetException  {qi(XPropertySet.class, proxy).setPropertyValue(arg0, arg1);}
+    @Override public Object getPropertyValue (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertySet.class, proxy).getPropertyValue(arg0);}
     @Override public void addPropertyChangeListener (String arg0, XPropertyChangeListener arg1) throws UnknownPropertyException, WrappedTargetException  {qi(XPropertySet.class, proxy).addPropertyChangeListener(arg0, 
             arg1 instanceof Proxiable ? qi(XPropertyChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
@@ -141,15 +172,15 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
     @Override public void removeVetoableChangeListener (String arg0, XVetoableChangeListener arg1) throws UnknownPropertyException, WrappedTargetException  {qi(XPropertySet.class, proxy).removeVetoableChangeListener(arg0, 
             arg1 instanceof Proxiable ? qi(XVetoableChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
-    @Override public Object getPropertyValue (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertySet.class, proxy).getPropertyValue(arg0);}
-    @Override public long getSomething (byte[] arg0)  {return qi(XUnoTunnel.class, proxy).getSomething(arg0);}
-    @Override public void removeRangeSelectionChangeListener (XRangeSelectionChangeListener arg0)  {qi(XRangeSelection.class, proxy).removeRangeSelectionChangeListener(
-            arg0 instanceof Proxiable ? qi(XRangeSelectionChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
+    @Override public XPropertySetInfo getPropertySetInfo ()  {return qi(XPropertySet.class, proxy).getPropertySetInfo();}
+    @Override public XEnumeration createEnumeration ()  {return qi(XEnumerationAccess.class, proxy).createEnumeration();}
+    @Override public boolean hasElements ()  {return qi(XEnumerationAccess.class, proxy).hasElements();}
+    @Override public Type getElementType ()  {return qi(XEnumerationAccess.class, proxy).getElementType();}
+    @Override public void addActivationEventListener (XActivationEventListener arg0)  {qi(XActivationBroadcaster.class, proxy).addActivationEventListener(
+            arg0 instanceof Proxiable ? qi(XActivationEventListener.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public void startRangeSelection (PropertyValue[] arg0)  {qi(XRangeSelection.class, proxy).startRangeSelection(arg0);}
-    @Override public void abortRangeSelection ()  {qi(XRangeSelection.class, proxy).abortRangeSelection();}
-    @Override public void addRangeSelectionListener (XRangeSelectionListener arg0)  {qi(XRangeSelection.class, proxy).addRangeSelectionListener(
-            arg0 instanceof Proxiable ? qi(XRangeSelectionListener.class, ((Proxiable)arg0).getProxy()) : arg0
+    @Override public void removeActivationEventListener (XActivationEventListener arg0)  {qi(XActivationBroadcaster.class, proxy).removeActivationEventListener(
+            arg0 instanceof Proxiable ? qi(XActivationEventListener.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
     @Override public void removeRangeSelectionListener (XRangeSelectionListener arg0)  {qi(XRangeSelection.class, proxy).removeRangeSelectionListener(
             arg0 instanceof Proxiable ? qi(XRangeSelectionListener.class, ((Proxiable)arg0).getProxy()) : arg0
@@ -157,10 +188,19 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
     @Override public void addRangeSelectionChangeListener (XRangeSelectionChangeListener arg0)  {qi(XRangeSelection.class, proxy).addRangeSelectionChangeListener(
             arg0 instanceof Proxiable ? qi(XRangeSelectionChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
+    @Override public void removeRangeSelectionChangeListener (XRangeSelectionChangeListener arg0)  {qi(XRangeSelection.class, proxy).removeRangeSelectionChangeListener(
+            arg0 instanceof Proxiable ? qi(XRangeSelectionChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
+    @Override public void addRangeSelectionListener (XRangeSelectionListener arg0)  {qi(XRangeSelection.class, proxy).addRangeSelectionListener(
+            arg0 instanceof Proxiable ? qi(XRangeSelectionListener.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
+    @Override public void startRangeSelection (PropertyValue[] arg0)  {qi(XRangeSelection.class, proxy).startRangeSelection(arg0);}
+    @Override public void abortRangeSelection ()  {qi(XRangeSelection.class, proxy).abortRangeSelection();}
     @Override public XSidebarProvider getSidebar ()  {return qi(XController2.class, proxy).getSidebar();}
     @Override public String getViewControllerName ()  {return qi(XController2.class, proxy).getViewControllerName();}
     @Override public PropertyValue[] getCreationArguments ()  {return qi(XController2.class, proxy).getCreationArguments();}
     @Override public XWindow getComponentWindow ()  {return qi(XController2.class, proxy).getComponentWindow();}
+    @Override public XFrame getFrame ()  {return qi(XController2.class, proxy).getFrame();}
     @Override public boolean suspend (boolean arg0)  {return qi(XController2.class, proxy).suspend(arg0);}
     @Override public void attachFrame (XFrame arg0)  {qi(XController2.class, proxy).attachFrame(
             arg0 instanceof Proxiable ? qi(XFrame.class, ((Proxiable)arg0).getProxy()) : arg0
@@ -170,7 +210,6 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
             );}
     @Override public Object getViewData ()  {return qi(XController2.class, proxy).getViewData();}
     @Override public void restoreViewData (Object arg0)  {qi(XController2.class, proxy).restoreViewData(arg0);}
-    @Override public XFrame getFrame ()  {return qi(XController2.class, proxy).getFrame();}
     @Override public XModel getModel ()  {return qi(XController2.class, proxy).getModel();}
     @Override public void dispose ()  {qi(XController2.class, proxy).dispose();}
     @Override public void addEventListener (XEventListener arg0)  {qi(XController2.class, proxy).addEventListener(
@@ -178,18 +217,6 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
             );}
     @Override public void removeEventListener (XEventListener arg0)  {qi(XController2.class, proxy).removeEventListener(
             arg0 instanceof Proxiable ? qi(XEventListener.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
-    @Override public boolean getIsWindowSplit ()  {return qi(XViewSplitable.class, proxy).getIsWindowSplit();}
-    @Override public int getSplitHorizontal ()  {return qi(XViewSplitable.class, proxy).getSplitHorizontal();}
-    @Override public int getSplitVertical ()  {return qi(XViewSplitable.class, proxy).getSplitVertical();}
-    @Override public int getSplitColumn ()  {return qi(XViewSplitable.class, proxy).getSplitColumn();}
-    @Override public int getSplitRow ()  {return qi(XViewSplitable.class, proxy).getSplitRow();}
-    @Override public void splitAtPosition (int arg0, int arg1)  {qi(XViewSplitable.class, proxy).splitAtPosition(arg0, arg1);}
-    @Override public void registerContextMenuInterceptor (XContextMenuInterceptor arg0)  {qi(XContextMenuInterception.class, proxy).registerContextMenuInterceptor(
-            arg0 instanceof Proxiable ? qi(XContextMenuInterceptor.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
-    @Override public void releaseContextMenuInterceptor (XContextMenuInterceptor arg0)  {qi(XContextMenuInterception.class, proxy).releaseContextMenuInterceptor(
-            arg0 instanceof Proxiable ? qi(XContextMenuInterceptor.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
     @Override public void initialize (Object[] arg0) throws Exception  {qi(XInitialization.class, proxy).initialize(arg0);}
     @Override public BorderWidths getBorder ()  {return qi(XControllerBorder.class, proxy).getBorder();}
@@ -200,58 +227,24 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
             arg0 instanceof Proxiable ? qi(XBorderResizeListener.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
     @Override public Rectangle queryBorderedArea (Rectangle arg0)  {return qi(XControllerBorder.class, proxy).queryBorderedArea(arg0);}
-    @Override public void removeActivationEventListener (XActivationEventListener arg0)  {qi(XActivationBroadcaster.class, proxy).removeActivationEventListener(
-            arg0 instanceof Proxiable ? qi(XActivationEventListener.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
-    @Override public void addActivationEventListener (XActivationEventListener arg0)  {qi(XActivationBroadcaster.class, proxy).addActivationEventListener(
-            arg0 instanceof Proxiable ? qi(XActivationEventListener.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
-    @Override public XAdapter queryAdapter ()  {return qi(XWeak.class, proxy).queryAdapter();}
-    @Override public void appendInfobar (String arg0, String arg1, String arg2, int arg3, StringPair[] arg4, boolean arg5) throws IllegalArgumentException  {qi(XInfobarProvider.class, proxy).appendInfobar(arg0, arg1, arg2, arg3, arg4, arg5);}
-    @Override public void updateInfobar (String arg0, String arg1, String arg2, int arg3) throws NoSuchElementException  {qi(XInfobarProvider.class, proxy).updateInfobar(arg0, arg1, arg2, arg3);}
-    @Override public void removeInfobar (String arg0) throws NoSuchElementException  {qi(XInfobarProvider.class, proxy).removeInfobar(arg0);}
-    @Override public boolean hasInfobar (String arg0)  {return qi(XInfobarProvider.class, proxy).hasInfobar(arg0);}
-    @Override public boolean hasFrozenPanes ()  {return qi(XViewFreezable.class, proxy).hasFrozenPanes();}
-    @Override public void freezeAtPosition (int arg0, int arg1)  {qi(XViewFreezable.class, proxy).freezeAtPosition(arg0, arg1);}
-    @Override public XEnumeration createEnumeration ()  {return qi(XEnumerationAccess.class, proxy).createEnumeration();}
-    @Override public Type getElementType ()  {return qi(XEnumerationAccess.class, proxy).getElementType();}
-    @Override public boolean hasElements ()  {return qi(XEnumerationAccess.class, proxy).hasElements();}
-    @Override public String[] getSupportedServiceNames ()  {return qi(XServiceInfo.class, proxy).getSupportedServiceNames();}
-    @Override public boolean supportsService (String arg0)  {return qi(XServiceInfo.class, proxy).supportsService(arg0);}
-    @Override public String getImplementationName ()  {return qi(XServiceInfo.class, proxy).getImplementationName();}
-    @Override public short[] getSupportedCommandGroups ()  {return qi(XDispatchInformationProvider.class, proxy).getSupportedCommandGroups();}
-    @Override public DispatchInformation[] getConfigurableDispatchInformation (short arg0)  {return qi(XDispatchInformationProvider.class, proxy).getConfigurableDispatchInformation(arg0);}
+    @Override public XDispatch queryDispatch (URL arg0, String arg1, int arg2)  {return qi(XDispatchProvider.class, proxy).queryDispatch(arg0, arg1, arg2);}
+    @Override public XDispatch[] queryDispatches (DispatchDescriptor[] arg0)  {return qi(XDispatchProvider.class, proxy).queryDispatches(arg0);}
     @Override public void addEnhancedMouseClickHandler (XEnhancedMouseClickHandler arg0)  {qi(XEnhancedMouseClickBroadcaster.class, proxy).addEnhancedMouseClickHandler(
             arg0 instanceof Proxiable ? qi(XEnhancedMouseClickHandler.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
     @Override public void removeEnhancedMouseClickHandler (XEnhancedMouseClickHandler arg0)  {qi(XEnhancedMouseClickBroadcaster.class, proxy).removeEnhancedMouseClickHandler(
             arg0 instanceof Proxiable ? qi(XEnhancedMouseClickHandler.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public void setFirstVisibleRow (int arg0)  {qi(XViewPane.class, proxy).setFirstVisibleRow(arg0);}
-    @Override public CellRangeAddress getVisibleRange ()  {return qi(XViewPane.class, proxy).getVisibleRange();}
-    @Override public int getFirstVisibleColumn ()  {return qi(XViewPane.class, proxy).getFirstVisibleColumn();}
-    @Override public void setFirstVisibleColumn (int arg0)  {qi(XViewPane.class, proxy).setFirstVisibleColumn(arg0);}
-    @Override public int getFirstVisibleRow ()  {return qi(XViewPane.class, proxy).getFirstVisibleRow();}
-    @Override public boolean isFormDesignMode ()  {return qi(XFormLayerAccess.class, proxy).isFormDesignMode();}
-    @Override public XFormController getFormController (XForm arg0)  {return qi(XFormLayerAccess.class, proxy).getFormController(
-            arg0 instanceof Proxiable ? qi(XForm.class, ((Proxiable)arg0).getProxy()) : arg0
+    @Override public void releaseContextMenuInterceptor (XContextMenuInterceptor arg0)  {qi(XContextMenuInterception.class, proxy).releaseContextMenuInterceptor(
+            arg0 instanceof Proxiable ? qi(XContextMenuInterceptor.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public void setFormDesignMode (boolean arg0)  {qi(XFormLayerAccess.class, proxy).setFormDesignMode(arg0);}
-    @Override public XControl getControl (XControlModel arg0) throws NoSuchElementException  {return qi(XFormLayerAccess.class, proxy).getControl(
-            arg0 instanceof Proxiable ? qi(XControlModel.class, ((Proxiable)arg0).getProxy()) : arg0
+    @Override public void registerContextMenuInterceptor (XContextMenuInterceptor arg0)  {qi(XContextMenuInterception.class, proxy).registerContextMenuInterceptor(
+            arg0 instanceof Proxiable ? qi(XContextMenuInterceptor.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
+    @Override public XAdapter queryAdapter ()  {return qi(XWeak.class, proxy).queryAdapter();}
     @Override public int getCount ()  {return qi(XIndexAccess.class, proxy).getCount();}
     @Override public Object getByIndex (int arg0) throws IndexOutOfBoundsException, WrappedTargetException  {return qi(XIndexAccess.class, proxy).getByIndex(arg0);}
-    @Override public XSpreadsheet getActiveSheet ()  {return qi(XSpreadsheetView.class, proxy).getActiveSheet();}
-    @Override public void setActiveSheet (XSpreadsheet arg0)  {qi(XSpreadsheetView.class, proxy).setActiveSheet(
-            arg0 instanceof Proxiable ? qi(XSpreadsheet.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
-    @Override public byte[] getImplementationId ()  {return qi(XTypeProvider.class, proxy).getImplementationId();}
-    @Override public Type[] getTypes ()  {return qi(XTypeProvider.class, proxy).getTypes();}
-    @Override public XTransferable getTransferable ()  {return qi(XTransferableSupplier.class, proxy).getTransferable();}
-    @Override public void insertTransferable (XTransferable arg0) throws UnsupportedFlavorException  {qi(XTransferableSupplier.class, proxy).insertTransferable(
-            arg0 instanceof Proxiable ? qi(XTransferable.class, ((Proxiable)arg0).getProxy()) : arg0
-            );}
+    @Override public boolean select (Object arg0) throws IllegalArgumentException  {return qi(XSelectionSupplier.class, proxy).select(arg0);}
     @Override public Object getSelection ()  {return qi(XSelectionSupplier.class, proxy).getSelection();}
     @Override public void addSelectionChangeListener (XSelectionChangeListener arg0)  {qi(XSelectionSupplier.class, proxy).addSelectionChangeListener(
             arg0 instanceof Proxiable ? qi(XSelectionChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
@@ -259,6 +252,13 @@ public class P_Controller implements Proxiable, XDispatchProvider, XCellRangeRef
     @Override public void removeSelectionChangeListener (XSelectionChangeListener arg0)  {qi(XSelectionSupplier.class, proxy).removeSelectionChangeListener(
             arg0 instanceof Proxiable ? qi(XSelectionChangeListener.class, ((Proxiable)arg0).getProxy()) : arg0
             );}
-    @Override public boolean select (Object arg0) throws IllegalArgumentException  {return qi(XSelectionSupplier.class, proxy).select(arg0);}
+    @Override public long getSomething (byte[] arg0)  {return qi(XUnoTunnel.class, proxy).getSomething(arg0);}
+    @Override public XStatusIndicator getStatusIndicator ()  {return qi(XStatusIndicatorSupplier.class, proxy).getStatusIndicator();}
+    @Override public short[] getSupportedCommandGroups ()  {return qi(XDispatchInformationProvider.class, proxy).getSupportedCommandGroups();}
+    @Override public DispatchInformation[] getConfigurableDispatchInformation (short arg0)  {return qi(XDispatchInformationProvider.class, proxy).getConfigurableDispatchInformation(arg0);}
+    @Override public XTransferable getTransferable ()  {return qi(XTransferableSupplier.class, proxy).getTransferable();}
+    @Override public void insertTransferable (XTransferable arg0) throws UnsupportedFlavorException  {qi(XTransferableSupplier.class, proxy).insertTransferable(
+            arg0 instanceof Proxiable ? qi(XTransferable.class, ((Proxiable)arg0).getProxy()) : arg0
+            );}
 }
     

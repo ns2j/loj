@@ -19,7 +19,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.uno.UnoRuntime;
 import loj.proxy.Proxiable;
 
-public class P_PropertySet implements Proxiable, XMultiPropertySet, XPropertySet, XPropertyState, XTolerantMultiPropertySet {
+public class P_PropertySet implements Proxiable, XPropertyState, XMultiPropertySet, XPropertySet, XTolerantMultiPropertySet {
     protected Object proxy;
 
     public P_PropertySet(Object object) {this.proxy = object;}
@@ -44,6 +44,10 @@ public class P_PropertySet implements Proxiable, XMultiPropertySet, XPropertySet
         return this;
     }
 
+    @Override public PropertyState getPropertyState (String arg0) throws UnknownPropertyException  {return qi(XPropertyState.class, proxy).getPropertyState(arg0);}
+    @Override public PropertyState[] getPropertyStates (String[] arg0) throws UnknownPropertyException  {return qi(XPropertyState.class, proxy).getPropertyStates(arg0);}
+    @Override public void setPropertyToDefault (String arg0) throws UnknownPropertyException  {qi(XPropertyState.class, proxy).setPropertyToDefault(arg0);}
+    @Override public Object getPropertyDefault (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertyState.class, proxy).getPropertyDefault(arg0);}
     @Override public XPropertySetInfo getPropertySetInfo ()  {return qi(XMultiPropertySet.class, proxy).getPropertySetInfo();}
     @Override public void setPropertyValues (String[] arg0, Object[] arg1) throws PropertyVetoException, IllegalArgumentException, WrappedTargetException  {qi(XMultiPropertySet.class, proxy).setPropertyValues(arg0, arg1);}
     @Override public Object[] getPropertyValues (String[] arg0)  {return qi(XMultiPropertySet.class, proxy).getPropertyValues(arg0);}
@@ -57,6 +61,7 @@ public class P_PropertySet implements Proxiable, XMultiPropertySet, XPropertySet
             arg1 instanceof Proxiable ? qi(XPropertiesChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
     @Override public void setPropertyValue (String arg0, Object arg1) throws UnknownPropertyException, PropertyVetoException, IllegalArgumentException, WrappedTargetException  {qi(XPropertySet.class, proxy).setPropertyValue(arg0, arg1);}
+    @Override public Object getPropertyValue (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertySet.class, proxy).getPropertyValue(arg0);}
     @Override public void addPropertyChangeListener (String arg0, XPropertyChangeListener arg1) throws UnknownPropertyException, WrappedTargetException  {qi(XPropertySet.class, proxy).addPropertyChangeListener(arg0, 
             arg1 instanceof Proxiable ? qi(XPropertyChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
@@ -69,11 +74,6 @@ public class P_PropertySet implements Proxiable, XMultiPropertySet, XPropertySet
     @Override public void removeVetoableChangeListener (String arg0, XVetoableChangeListener arg1) throws UnknownPropertyException, WrappedTargetException  {qi(XPropertySet.class, proxy).removeVetoableChangeListener(arg0, 
             arg1 instanceof Proxiable ? qi(XVetoableChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
-    @Override public Object getPropertyValue (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertySet.class, proxy).getPropertyValue(arg0);}
-    @Override public PropertyState getPropertyState (String arg0) throws UnknownPropertyException  {return qi(XPropertyState.class, proxy).getPropertyState(arg0);}
-    @Override public PropertyState[] getPropertyStates (String[] arg0) throws UnknownPropertyException  {return qi(XPropertyState.class, proxy).getPropertyStates(arg0);}
-    @Override public void setPropertyToDefault (String arg0) throws UnknownPropertyException  {qi(XPropertyState.class, proxy).setPropertyToDefault(arg0);}
-    @Override public Object getPropertyDefault (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertyState.class, proxy).getPropertyDefault(arg0);}
     @Override public SetPropertyTolerantFailed[] setPropertyValuesTolerant (String[] arg0, Object[] arg1) throws IllegalArgumentException  {return qi(XTolerantMultiPropertySet.class, proxy).setPropertyValuesTolerant(arg0, arg1);}
     @Override public GetPropertyTolerantResult[] getPropertyValuesTolerant (String[] arg0)  {return qi(XTolerantMultiPropertySet.class, proxy).getPropertyValuesTolerant(arg0);}
     @Override public GetDirectPropertyTolerantResult[] getDirectPropertyValuesTolerant (String[] arg0)  {return qi(XTolerantMultiPropertySet.class, proxy).getDirectPropertyValuesTolerant(arg0);}

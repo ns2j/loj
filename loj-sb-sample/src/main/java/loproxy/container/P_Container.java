@@ -21,7 +21,7 @@ import com.sun.star.uno.XWeak;
 import com.sun.star.uno.UnoRuntime;
 import loj.proxy.Proxiable;
 
-public class P_Container implements Proxiable, XPropertySet, XNameContainer, XIndexAccess, XTypeProvider, XServiceInfo, XWeak {
+public class P_Container implements Proxiable, XIndexAccess, XServiceInfo, XPropertySet, XNameContainer, XTypeProvider, XWeak {
     protected Object proxy;
 
     public P_Container(Object object) {this.proxy = object;}
@@ -46,8 +46,15 @@ public class P_Container implements Proxiable, XPropertySet, XNameContainer, XIn
         return this;
     }
 
-    @Override public XPropertySetInfo getPropertySetInfo ()  {return qi(XPropertySet.class, proxy).getPropertySetInfo();}
+    @Override public int getCount ()  {return qi(XIndexAccess.class, proxy).getCount();}
+    @Override public Object getByIndex (int arg0) throws IndexOutOfBoundsException, WrappedTargetException  {return qi(XIndexAccess.class, proxy).getByIndex(arg0);}
+    @Override public boolean hasElements ()  {return qi(XIndexAccess.class, proxy).hasElements();}
+    @Override public Type getElementType ()  {return qi(XIndexAccess.class, proxy).getElementType();}
+    @Override public String getImplementationName ()  {return qi(XServiceInfo.class, proxy).getImplementationName();}
+    @Override public String[] getSupportedServiceNames ()  {return qi(XServiceInfo.class, proxy).getSupportedServiceNames();}
+    @Override public boolean supportsService (String arg0)  {return qi(XServiceInfo.class, proxy).supportsService(arg0);}
     @Override public void setPropertyValue (String arg0, Object arg1) throws UnknownPropertyException, PropertyVetoException, IllegalArgumentException, WrappedTargetException  {qi(XPropertySet.class, proxy).setPropertyValue(arg0, arg1);}
+    @Override public Object getPropertyValue (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertySet.class, proxy).getPropertyValue(arg0);}
     @Override public void addPropertyChangeListener (String arg0, XPropertyChangeListener arg1) throws UnknownPropertyException, WrappedTargetException  {qi(XPropertySet.class, proxy).addPropertyChangeListener(arg0, 
             arg1 instanceof Proxiable ? qi(XPropertyChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
@@ -60,22 +67,15 @@ public class P_Container implements Proxiable, XPropertySet, XNameContainer, XIn
     @Override public void removeVetoableChangeListener (String arg0, XVetoableChangeListener arg1) throws UnknownPropertyException, WrappedTargetException  {qi(XPropertySet.class, proxy).removeVetoableChangeListener(arg0, 
             arg1 instanceof Proxiable ? qi(XVetoableChangeListener.class, ((Proxiable)arg1).getProxy()) : arg1
             );}
-    @Override public Object getPropertyValue (String arg0) throws UnknownPropertyException, WrappedTargetException  {return qi(XPropertySet.class, proxy).getPropertyValue(arg0);}
+    @Override public XPropertySetInfo getPropertySetInfo ()  {return qi(XPropertySet.class, proxy).getPropertySetInfo();}
     @Override public void removeByName (String arg0) throws NoSuchElementException, WrappedTargetException  {qi(XNameContainer.class, proxy).removeByName(arg0);}
     @Override public void insertByName (String arg0, Object arg1) throws IllegalArgumentException, ElementExistException, WrappedTargetException  {qi(XNameContainer.class, proxy).insertByName(arg0, arg1);}
     @Override public void replaceByName (String arg0, Object arg1) throws IllegalArgumentException, NoSuchElementException, WrappedTargetException  {qi(XNameContainer.class, proxy).replaceByName(arg0, arg1);}
     @Override public Object getByName (String arg0) throws NoSuchElementException, WrappedTargetException  {return qi(XNameContainer.class, proxy).getByName(arg0);}
-    @Override public String[] getElementNames ()  {return qi(XNameContainer.class, proxy).getElementNames();}
     @Override public boolean hasByName (String arg0)  {return qi(XNameContainer.class, proxy).hasByName(arg0);}
-    @Override public Type getElementType ()  {return qi(XNameContainer.class, proxy).getElementType();}
-    @Override public boolean hasElements ()  {return qi(XNameContainer.class, proxy).hasElements();}
-    @Override public int getCount ()  {return qi(XIndexAccess.class, proxy).getCount();}
-    @Override public Object getByIndex (int arg0) throws IndexOutOfBoundsException, WrappedTargetException  {return qi(XIndexAccess.class, proxy).getByIndex(arg0);}
-    @Override public byte[] getImplementationId ()  {return qi(XTypeProvider.class, proxy).getImplementationId();}
+    @Override public String[] getElementNames ()  {return qi(XNameContainer.class, proxy).getElementNames();}
     @Override public Type[] getTypes ()  {return qi(XTypeProvider.class, proxy).getTypes();}
-    @Override public String[] getSupportedServiceNames ()  {return qi(XServiceInfo.class, proxy).getSupportedServiceNames();}
-    @Override public boolean supportsService (String arg0)  {return qi(XServiceInfo.class, proxy).supportsService(arg0);}
-    @Override public String getImplementationName ()  {return qi(XServiceInfo.class, proxy).getImplementationName();}
+    @Override public byte[] getImplementationId ()  {return qi(XTypeProvider.class, proxy).getImplementationId();}
     @Override public XAdapter queryAdapter ()  {return qi(XWeak.class, proxy).queryAdapter();}
 }
     
