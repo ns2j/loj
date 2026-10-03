@@ -81,7 +81,8 @@ public class Doc extends P_Doc implements AutoCloseable {
         destSheet.prop("PageStyle", styleName);
         P_Controller destCont = activate(destSheet);
         if (splitCol > 0 || splitRow > 0) {
-            if (splitRow > 1) splitRow--;  logger.warn("why need this");//bug? need this
+            // Adjust getSplitRow() for freezeAtPosition(); columns need no adjustment.
+            if (splitRow > 1) splitRow--;
             destCont.freezeAtPosition(splitCol, splitRow);
         } else if (splitHori > 0 || splitVert > 0) {
             destCont.splitAtPosition(splitHori, splitVert);
