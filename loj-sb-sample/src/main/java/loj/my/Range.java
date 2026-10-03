@@ -6,25 +6,63 @@ import com.sun.star.lang.IndexOutOfBoundsException;
 
 import loproxy.table.P_Range;
 
+/**
+ * Wrapper for a spreadsheet cell range.
+ */
 public class Range extends P_Range {
+    /**
+     * Constructs a Range from a UNO object.
+     *
+     * @param object the UNO cell range object
+     */
     public Range(Object object) {
         super(object);
     }
 
+    /**
+     * Returns a cell within this range by column and row index.
+     *
+     * @param col the column index within the range
+     * @param row the row index within the range
+     * @return the Cell
+     * @throws IndexOutOfBoundsException if out of bounds
+     */
     public Cell getCell(int col, int row) throws IndexOutOfBoundsException {
         var a = getRangeAddress();
         return new Cell(getSpreadsheet().getCellByPosition(a.StartColumn + col, a.StartRow + row));
     }
+    
+    /**
+     * Returns the top-left cell of this range.
+     *
+     * @return the Cell
+     * @throws IndexOutOfBoundsException if out of bounds
+     */
     public Cell getCell() throws IndexOutOfBoundsException {
         return getCell(0, 0);
     }
 
+    /**
+     * Returns an iterator that traverses the cells horizontally.
+     *
+     * @return an Iterable over Cells
+     */
     public Iterable<Cell> getHoriIterator() {
         return new Iter(false);
     }
+    
+    /**
+     * Returns an iterator that traverses the cells vertically.
+     *
+     * @return an Iterable over Cells
+     */
     public Iterable<Cell> getVertIterator() {
         return new Iter(true);
     }
+    
+    /**
+     * Internal iterator implementation for Range.
+     */
     class Iter implements Iterator<Cell>, Iterable<Cell> {
         boolean vert;
         int c;

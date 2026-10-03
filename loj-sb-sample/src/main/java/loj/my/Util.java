@@ -21,11 +21,28 @@ import com.sun.star.uno.UnoRuntime;
 
 import loj.proxy.Proxiable;
 
+/**
+ * Utility class for working with UNO components and properties.
+ */
 public class Util {
+    /**
+     * Queries a UNO interface from an object.
+     *
+     * @param <T> the type of the interface to query
+     * @param inteface the class object of the interface
+     * @param object the UNO object
+     * @return the queried interface, or null if not found
+     */
     public static <T> T qi(Class<T> inteface, Object object) {
         return UnoRuntime.queryInterface(inteface, object);
     }
     
+    /**
+     * Converts a map of string-object pairs to an array of PropertyValue.
+     *
+     * @param map the map of properties
+     * @return an array of PropertyValue
+     */
     public static PropertyValue[] getPropertyValueArray(Map<String, Object> map) {
         return map.keySet().stream().map(k -> {
             PropertyValue pv = new PropertyValue();
