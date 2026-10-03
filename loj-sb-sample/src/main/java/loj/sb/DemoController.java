@@ -2,6 +2,9 @@ package loj.sb;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -18,6 +21,7 @@ import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.XComponentContext;
+import com.sun.star.beans.PropertyValue;
 
 import loj.my.Desktop;
 import loj.my.Doc;
@@ -73,5 +77,22 @@ public class DemoController {
         }
     }
 
+    @RequestMapping(value="/print", method=RequestMethod.GET)
+    public void print(HttpServletResponse response) throws java.lang.Exception {
+        //TempUserDirConnector connector = (TempUserDirConnector) source.getTarget();
+        TempUserDirConnector connector = (TempUserDirConnector)factory.getObject();
+        logger.info("connector.key: " + connector.key);
+        XComponentContext context = connector.connect();
+        Desktop desktop = new Desktop(context);
+        //Util.writeType("proxy.properties", desktop, "desktop");
+        try (Doc origDoc = desktop.getDocFromResource("original.ods");
+                Doc newDoc = desktop.getNewDoc();) {
+            indexService.make(origDoc, newDoc);
+            PropertyValue pv = new PropertyValue();
+            pv.Name = "Wait";
+            pv.Value = true;
+            newDoc.print(new PropertyValue[]{ pv });
+        }
+    }
 
 }
