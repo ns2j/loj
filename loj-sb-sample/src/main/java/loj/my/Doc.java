@@ -145,6 +145,28 @@ public class Doc extends P_Doc implements AutoCloseable {
     }
 
     /**
+     * Writes the document to an output stream with extra properties.
+     *
+     * @param os the output stream
+     * @param filterValue the export filter name
+     * @param extraProps additional properties for storeToURL
+     * @throws IOException if a Java IO error occurs
+     * @throws com.sun.star.io.IOException if a UNO IO error occurs
+     */
+    public void writeToStream(OutputStream os, String filterValue, Map<String, Object> extraProps)  throws IOException, com.sun.star.io.IOException {
+        LoOutputStream loOs = new LoOutputStream();
+        java.util.Map<String, Object> props = new java.util.HashMap<>();
+        props.put("OutputStream", loOs);
+        props.put("FilterName", filterValue);
+        if (extraProps != null) {
+            props.putAll(extraProps);
+        }
+        var pvs = Util.getPropertyValueArray(props);
+        storeToURL("private:stream", pvs);
+        os.write(loOs.toByteArray());
+    }
+
+    /**
      * Writes the document to an output stream.
      *
      * @param os the output stream
@@ -153,12 +175,7 @@ public class Doc extends P_Doc implements AutoCloseable {
      * @throws com.sun.star.io.IOException if a UNO IO error occurs
      */
     public void writeToStream(OutputStream os, String filterValue)  throws IOException, com.sun.star.io.IOException {
-        LoOutputStream loOs = new LoOutputStream();
-        var pvs = Util.getPropertyValueArray(
-                Map.of("OutputStream", loOs,
-                        "FilterName", filterValue));
-        storeToURL("private:stream", pvs);
-        os.write(loOs.toByteArray());
+        writeToStream(os, filterValue, null);
     }
 
     /**
@@ -173,6 +190,16 @@ public class Doc extends P_Doc implements AutoCloseable {
         P_Controller cont = new P_Controller(getCurrentController());
         cont.setActiveSheet(sheet);
         return cont;
+    }
+
+    /**
+     * Gets the active sheet.
+     *
+     * @return the active Sheet
+     */
+    public Sheet getActiveSheet() {
+        com.sun.star.sheet.XSpreadsheetView view = Util.qi(com.sun.star.sheet.XSpreadsheetView.class, getCurrentController());
+        return new Sheet(view.getActiveSheet());
     }
 
     @Override

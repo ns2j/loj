@@ -50,6 +50,25 @@ public class DemoController {
         response.setContentLength(baos.size());
     }
     
+    void setResponsePdf(HttpServletResponse response, Doc doc, loj.my.Sheet sheetToExport) throws com.sun.star.io.IOException, IOException {
+        response.setContentType("application/pdf");
+        response.addHeader("Content-Disposition", "attachment; filename=\"LojSbSample.pdf\"");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        java.util.Map<String, Object> extra = null;
+        if (sheetToExport != null) {
+            PropertyValue pv = new PropertyValue();
+            pv.Name = "Selection";
+            pv.Value = sheetToExport.getProxy();
+            extra = new java.util.HashMap<>();
+            extra.put("FilterData", new PropertyValue[]{ pv });
+        }
+        
+        doc.writeToStream(baos, "calc_pdf_Export", extra);
+        response.getOutputStream().write(baos.toByteArray());
+        response.setContentLength(baos.size());
+    }
+    
     @RequestMapping(value="/", method=RequestMethod.GET)
     public void index(HttpServletResponse response) throws java.lang.Exception {
         //TempUserDirConnector connector = (TempUserDirConnector) source.getTarget();
@@ -62,6 +81,20 @@ public class DemoController {
                 Doc newDoc = desktop.getNewDoc();) {
             indexService.make(origDoc, newDoc);
             setResponse(response, newDoc);
+        }
+    }
+
+    @RequestMapping(value="/pdf", method=RequestMethod.GET)
+    public void pdf(HttpServletResponse response) throws java.lang.Exception {
+        TempUserDirConnector connector = (TempUserDirConnector)factory.getObject();
+        logger.info("connector.key: " + connector.key);
+        XComponentContext context = connector.connect();
+        Desktop desktop = new Desktop(context);
+        try (Doc origDoc = desktop.getDocFromResource("original.ods");
+                Doc newDoc = desktop.getNewDoc();) {
+            indexService.make(origDoc, newDoc);
+            loj.my.Sheet sheetToExport = newDoc.getActiveSheet();
+            setResponsePdf(response, newDoc, sheetToExport);
         }
     }
 
