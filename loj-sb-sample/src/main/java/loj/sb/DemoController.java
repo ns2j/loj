@@ -3,7 +3,7 @@ package loj.sb;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 //import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
