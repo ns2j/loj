@@ -31,7 +31,7 @@ A source-code generator for creating Java wrapper classes from LibreOffice UNO i
 
 UNO programming often requires code such as:
 
-```java id="jscryn"
+```java id="vmtjgg"
 XSomething xSomething =
     UnoRuntime.queryInterface(XSomething.class, object);
 
@@ -42,7 +42,7 @@ xSomething.someMethod();
 
 Generated classes include:
 
-```text id="x9uypc"
+```text id="gmppxu"
 P_Doc
 P_Sheet
 P_Range
@@ -72,7 +72,7 @@ It contains:
 
 The basic architecture is:
 
-```text id="g16blj"
+```text id="zqnpkl"
 Application / Spring Boot
           |
           v
@@ -96,7 +96,7 @@ LOJ separates automatically generated UNO wrappers from higher-level, handwritte
 
 For example:
 
-```text id="1ltw1h"
+```text id="qapwzo"
 UNO XSpreadsheet
        |
        | loj-proxy
@@ -118,33 +118,33 @@ This is particularly useful when upgrading the LibreOffice dependency because th
 
 First build `loj-proxy`:
 
-```bash id="t9s6yk"
+```bash id="rxjdfr"
 cd loj-proxy
 mvn clean package
 ```
 
 Then move to the sample project:
 
-```bash id="b4xrlm"
+```bash id="ghytnk"
 cd ../loj-sb-sample
 ```
 
 Generate the proxy classes using `proxy.properties`:
 
-```bash id="q13c6b"
+```bash id="lzbvwu"
 java -jar ../loj-proxy/target/loj-proxy-1.0-SNAPSHOT.jar \
   loproxy proxy.properties
 ```
 
 The arguments are:
 
-```text id="k9g9u6"
+```text id="mrczws"
 java -jar loj-proxy.jar <output package/directory> <properties file>
 ```
 
 For the sample project:
 
-```text id="9gxtpj"
+```text id="tdasjp"
 output package/directory : loproxy
 properties file          : proxy.properties
 ```
@@ -153,7 +153,7 @@ properties file          : proxy.properties
 
 Conceptually:
 
-```text id="hcbp09"
+```text id="kbxnxj"
 proxy.properties
        |
        v
@@ -186,7 +186,7 @@ Generated methods delegate operations to the appropriate UNO interface using `Un
 
 This turns code conceptually similar to:
 
-```java id="i3nl1j"
+```java id="qocgbx"
 XSpreadsheet sheet =
     UnoRuntime.queryInterface(
         XSpreadsheet.class,
@@ -214,7 +214,7 @@ When a generated proxy includes `XPropertySet`, LOJ provides the fluent `prop()`
 
 For example:
 
-```java id="tbt8fj"
+```java id="bltfac"
 range
     .prop("CellBackColor", color)
     .prop("CellStyle", "My Style");
@@ -222,7 +222,7 @@ range
 
 instead of repeatedly calling:
 
-```java id="afgt36"
+```java id="zbxdfr"
 range.setPropertyValue("CellBackColor", color);
 range.setPropertyValue("CellStyle", "My Style");
 ```
@@ -233,7 +233,7 @@ This is especially useful for spreadsheet formatting.
 
 The sample project contains higher-level classes built on top of the generated proxy classes:
 
-```text id="m0n7bk"
+```text id="cyocqy"
 Doc
 Sheet
 Range
@@ -243,7 +243,7 @@ Prop
 
 ### Cells
 
-```java id="b2j31n"
+```java id="ohmtnb"
 Sheet sheet = doc.getSheet(0);
 
 Cell cell = sheet.getCell("A1");
@@ -251,7 +251,7 @@ Cell cell = sheet.getCell("A1");
 
 Cells can also be manipulated using a small fluent API:
 
-```java id="9dhygd"
+```java id="qtfukr"
 Cell cell = sheet.getCell("A1");
 
 cell.set("JAN")
@@ -263,7 +263,7 @@ cell.set("JAN")
 
 ### Ranges
 
-```java id="sw0j44"
+```java id="viyjve"
 Range range = sheet.getRange("A1:D10");
 
 range.prop("CellBackColor", 0xAAAAAA);
@@ -271,9 +271,7 @@ range.prop("CellBackColor", 0xAAAAAA);
 
 Ranges can also be iterated horizontally or vertically.
 
-For example:
-
-```java id="d86t9q"
+```java id="vzoxhu"
 for (Cell cell : range.getHoriIterator()) {
     // ...
 }
@@ -281,7 +279,7 @@ for (Cell cell : range.getHoriIterator()) {
 
 or:
 
-```java id="29gg0h"
+```java id="dxmtgb"
 for (Cell cell : range.getVertIterator()) {
     // ...
 }
@@ -291,20 +289,20 @@ for (Cell cell : range.getVertIterator()) {
 
 Higher-level wrappers provide operations such as:
 
-```java id="3g2f1s"
+```java id="jdqkmf"
 Sheet sheet = doc.getSheet("Sheet1");
 ```
 
 Sheets can be copied:
 
-```java id="1w6v4e"
+```java id="qtvhcs"
 Sheet newSheet =
     doc.copySheet(sheet, "New Sheet");
 ```
 
 and imported from another document:
 
-```java id="yp52c4"
+```java id="psukyb"
 Sheet imported =
     newDoc.importSheet(
         originalDoc,
@@ -319,7 +317,7 @@ LOJ can manipulate LibreOffice charts through generated UNO proxy classes.
 
 For example:
 
-```java id="gbr4eo"
+```java id="juhjlc"
 P_TableCharts charts =
     new P_TableCharts(sheet.getCharts());
 
@@ -334,7 +332,7 @@ charts.addNewByName(
 
 The resulting embedded chart can then be wrapped:
 
-```java id="0upv8m"
+```java id="jgqmsq"
 P_TableChart tableChart =
     new P_TableChart(
         charts.getByName("Example")
@@ -348,7 +346,7 @@ P_Chart chart =
 
 Properties can be changed using `Prop`:
 
-```java id="k8ncn3"
+```java id="lwmmlz"
 Prop.of(chart.getDiagram())
     .set("Dim3D", Boolean.TRUE);
 
@@ -364,7 +362,7 @@ This allows LibreOffice documents to be loaded or exported without requiring ord
 
 For example:
 
-```java id="7gbesb"
+```java id="rkhbux"
 doc.writeToStream(
     outputStream,
     "calc_pdf_Export"
@@ -373,9 +371,115 @@ doc.writeToStream(
 
 This is useful when LibreOffice is used as a document-processing backend in a server application.
 
+## LibreOffice UNO quirks
+
+LibreOffice UNO has a few APIs whose values cannot always be passed directly from one method to another.
+
+One example is restoring frozen panes when copying or importing a Calc sheet.
+
+LOJ obtains the current frozen-pane position from `XViewSplitable`:
+
+```java id="ahdqxl"
+int splitCol = controller.getSplitColumn();
+int splitRow = controller.getSplitRow();
+```
+
+and restores it using `XViewFreezable.freezeAtPosition()`:
+
+```java id="oetyfk"
+controller.freezeAtPosition(splitCol, splitRow);
+```
+
+However, `getSplitRow()` and `freezeAtPosition()` use different row-position semantics.
+
+In practical tests with LibreOffice, passing the value returned by `getSplitRow()` directly to `freezeAtPosition()` moves the frozen row boundary down by one row.
+
+For example:
+
+```text id="hkwrlu"
+Source:
+    frozen = true
+    column = 0
+    row    = 2
+
+Destination before freezeAtPosition():
+    frozen = false
+    column = 0
+    row    = 0
+
+Destination after freezeAtPosition(0, 2):
+    frozen = true
+    column = 0
+    row    = 3
+```
+
+The same behavior was reproduced with another row position:
+
+```text id="rzwyns"
+Source:
+    column = 1
+    row    = 4
+
+Destination after freezeAtPosition(1, 4):
+    column = 1
+    row    = 5
+```
+
+Column positions do not show the same behavior.
+
+For example, freezing at C1 produced:
+
+```text id="skpbrn"
+Source:
+    column = 2
+    row    = 0
+
+Destination after freezeAtPosition(2, 0):
+    column = 2
+    row    = 0
+```
+
+Therefore LOJ adjusts only the row value before restoring the frozen panes:
+
+```java id="wceuwk"
+// getSplitRow() and freezeAtPosition() use different row-position semantics.
+// Subtract one to preserve the source sheet's frozen row position.
+// No adjustment is required for getSplitColumn().
+if (splitRow > 1) {
+    splitRow--;
+}
+
+destController.freezeAtPosition(splitCol, splitRow);
+```
+
+This behavior is important when copying a sheet while preserving its view settings.
+
+In short:
+
+```text id="fjcvdi"
+getSplitColumn()
+        |
+        +--------------------------+
+                                   |
+                                   v
+                          freezeAtPosition()
+
+getSplitRow()
+        |
+        v
+   subtract 1
+        |
+        +--------------------------+
+                                   |
+                                   v
+                          freezeAtPosition()
+```
+
+This adjustment is intentional and should not be removed as an apparent off-by-one error.
+
 ## Project structure
 
-```text id="lx3nx7"
+```text id="ocmdgk"
 loj
 ├── loj-util
 │   ├── connector
@@ -409,14 +513,14 @@ When upgrading the LibreOffice dependency, rebuilding `loj-proxy` and regenerati
 
 Clone the repository:
 
-```bash id="i8a6fv"
+```bash id="ybbppq"
 git clone https://github.com/ns2j/loj.git
 cd loj
 ```
 
 Build the project:
 
-```bash id="gvkyu5"
+```bash id="vfvcng"
 mvn clean package
 ```
 
@@ -431,7 +535,7 @@ When updating the LibreOffice dependency:
 
 For example:
 
-```bash id="h6kdyz"
+```bash id="oyvcoj"
 mvn clean package
 
 cd loj-sb-sample
@@ -452,7 +556,7 @@ The LibreOffice UNO API is powerful and flexible, but its generic interface-orie
 
 LOJ separates the problem into two layers:
 
-```text id="s8y72h"
+```text id="ddqgpy"
 LibreOffice UNO
        |
        | generated automatically
