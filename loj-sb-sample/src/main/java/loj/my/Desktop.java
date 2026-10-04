@@ -16,6 +16,8 @@ import com.sun.star.uno.XComponentContext;
 import loj.streams.LoInputStream;
 import loproxy.frame.P_Desktop;
 
+import static loj.my.Util.*;
+
 /**
  * Wrapper for the LibreOffice Desktop service.
  */
@@ -51,11 +53,11 @@ public class Desktop extends P_Desktop {
         is.close();
 
         LoInputStream loIs= new LoInputStream(bytes.toByteArray());
-        var pvs = Util.getPropertyValueArray(Map.of(
+        var pvs = getPropertyValueArray(Map.of(
                 "InputStream", loIs,
                 "Hidden", Boolean.TRUE));
         return new Doc(loadComponentFromURL("private:stream", "_blank", 0, pvs));
-       // var pvs = Util.getPropertyValueArray(Map.of(
+       // var pvs = getPropertyValueArray(Map.of(
         //        "Hidden", Boolean.TRUE));
         //return new Doc(loadComponentFromURL("" + new File("test.ods").toURI(), "_blank", 0, pvs));
     }

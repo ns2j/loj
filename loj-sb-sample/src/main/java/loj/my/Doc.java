@@ -3,10 +3,12 @@ package loj.my;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.star.beans.PropertyValue;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.IndexOutOfBoundsException;
@@ -21,6 +23,8 @@ import loproxy.frame.P_Controller;
 import loproxy.style.P_Style;
 import loproxy.table.P_Doc;
 import loproxy.table.P_Sheets;
+
+import static loj.my.Util.*;
 
 /**
  * Wrapper for a spreadsheet document.
@@ -101,7 +105,7 @@ public class Doc extends P_Doc implements AutoCloseable {
      */
     public Sheet importSheet(Doc srcDoc, String srcSheetName, String destSheetName) throws IllegalArgumentException, Exception {
         P_Sheets sheets = new P_Sheets(getSheets());
-        //Util.writeType("proxy.properties", sheets, "sheets");
+        //writeType("proxy.properties", sheets, "sheets");
         sheets.importSheet(srcDoc, srcSheetName, sheets.getElementNames().length);
 
         Sheet srcSheet = srcDoc.getSheet(srcSheetName);
@@ -155,13 +159,13 @@ public class Doc extends P_Doc implements AutoCloseable {
      */
     public void writeToStream(OutputStream os, String filterValue, Map<String, Object> extraProps)  throws IOException, com.sun.star.io.IOException {
         LoOutputStream loOs = new LoOutputStream();
-        java.util.Map<String, Object> props = new java.util.HashMap<>();
+        Map<String, Object> props = new HashMap<>();
         props.put("OutputStream", loOs);
         props.put("FilterName", filterValue);
         if (extraProps != null) {
             props.putAll(extraProps);
         }
-        var pvs = Util.getPropertyValueArray(props);
+        PropertyValue[] pvs = getPropertyValueArray(props);
         storeToURL("private:stream", pvs);
         os.write(loOs.toByteArray());
     }
@@ -198,7 +202,7 @@ public class Doc extends P_Doc implements AutoCloseable {
      * @return the active Sheet
      */
     public Sheet getActiveSheet() {
-        com.sun.star.sheet.XSpreadsheetView view = Util.qi(com.sun.star.sheet.XSpreadsheetView.class, getCurrentController());
+        com.sun.star.sheet.XSpreadsheetView view = qi(com.sun.star.sheet.XSpreadsheetView.class, getCurrentController());
         return new Sheet(view.getActiveSheet());
     }
 

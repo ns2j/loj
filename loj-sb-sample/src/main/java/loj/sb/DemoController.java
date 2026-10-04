@@ -2,6 +2,8 @@ package loj.sb;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
+
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 
@@ -25,6 +27,9 @@ import com.sun.star.beans.PropertyValue;
 
 import loj.my.Desktop;
 import loj.my.Doc;
+import loj.my.Sheet;
+
+import static loj.my.Util.*;
 import loj.tempuserdir.TempUserDirConnector;
 
 @RestController
@@ -50,18 +55,16 @@ public class DemoController {
         response.setContentLength(baos.size());
     }
     
-    void setResponsePdf(HttpServletResponse response, Doc doc, loj.my.Sheet sheetToExport) throws com.sun.star.io.IOException, IOException {
+    void setResponsePdf(HttpServletResponse response, Doc doc, Sheet sheetToExport) throws com.sun.star.io.IOException, IOException {
         response.setContentType("application/pdf");
-        response.addHeader("Content-Disposition", "attachment; filename=\"LojSbSample.pdf\"");
+        //response.addHeader("Content-Disposition", "attachment; filename=\"LojSbSample.pdf\"");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
-        java.util.Map<String, Object> extra = null;
+        Map<String, Object> extra = null;
         if (sheetToExport != null) {
-            PropertyValue pv = new PropertyValue();
-            pv.Name = "Selection";
-            pv.Value = sheetToExport.getProxy();
+            PropertyValue[] pvs = getPropertyValueArray(Map.of("Selection", sheetToExport.getProxy()));
             extra = new java.util.HashMap<>();
-            extra.put("FilterData", new PropertyValue[]{ pv });
+            extra.put("FilterData", pvs);
         }
         
         doc.writeToStream(baos, "calc_pdf_Export", extra);
@@ -93,7 +96,7 @@ public class DemoController {
         try (Doc origDoc = desktop.getDocFromResource("original.ods");
                 Doc newDoc = desktop.getNewDoc();) {
             indexService.make(origDoc, newDoc);
-            loj.my.Sheet sheetToExport = newDoc.getActiveSheet();
+            Sheet sheetToExport = newDoc.getActiveSheet();
             setResponsePdf(response, newDoc, sheetToExport);
         }
     }
@@ -121,11 +124,8 @@ public class DemoController {
         try (Doc origDoc = desktop.getDocFromResource("original.ods");
                 Doc newDoc = desktop.getNewDoc();) {
             indexService.make(origDoc, newDoc);
-            PropertyValue pv = new PropertyValue();
-            pv.Name = "Wait";
-            pv.Value = true;
-            newDoc.print(new PropertyValue[]{ pv });
+            PropertyValue[] pvs = getPropertyValueArray(Map.of("Name", "Wait")); 
+            newDoc.print(pvs);
         }
     }
-
 }
