@@ -120,7 +120,7 @@ First build `loj-proxy`:
 
 ```bash id="rxjdfr"
 cd loj-proxy
-mvn clean package
+mvn clean install
 ```
 
 Then move to the sample project:
