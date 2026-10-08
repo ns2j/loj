@@ -41,7 +41,12 @@ public class IndexService {
             c.set(i + 100).right()
             .set(i + 3).right()
             .set(i + 10);
-            c.prop("CellBackColor", Util.getColor("#AAAAAA"));
+            
+            // Zebra striping for the data rows
+            int color = (i % 2 == 0) ? Util.getColor("#F4F6F6") : Util.getColor("#FFFFFF");
+            Range rowRange = newSheet.getRange(c, c.right(3));
+            rowRange.prop("CellBackColor", color);
+            
             last = c;
         }
         Cell sum = last.down();
@@ -52,6 +57,8 @@ public class IndexService {
         tb.LineWidth = 50;
         sum.prop("LeftBorder2", tb);
         sumRange.prop("TopBorder2", tb).prop("BottomBorder2", tb);
+        sumRange.prop("CellBackColor", Util.getColor("#D4E6F1")); // Light blue for the total row
+        sumRange.prop("CharWeight", 150.0f); // Bold text (com.sun.star.awt.FontWeight.BOLD)
         sumEnd.prop("RightBorder2", tb);
         
         Range r = newSheet.getRange("F2:H4");
