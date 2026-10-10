@@ -124,7 +124,7 @@ public class DemoController {
         try (Doc origDoc = desktop.getDocFromResource("original.ods");
                 Doc newDoc = desktop.getNewDoc();) {
             indexService.make(origDoc, newDoc);
-            PropertyValue[] pvs = getPropertyValueArray(Map.of("Name", "Wait")); 
+            PropertyValue[] pvs = getPropertyValueArray(Map.of("Wait", true)); 
             newDoc.print(pvs);
         }
     }
