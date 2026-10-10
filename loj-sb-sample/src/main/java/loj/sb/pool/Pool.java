@@ -2,6 +2,7 @@
 package loj.sb.pool;
 
 import java.net.MalformedURLException;
+import java.time.Duration;
 
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
@@ -78,6 +79,7 @@ public class Pool {
         config.setMaxTotal(10);
         config.setMaxIdle(2);
         config.setMinIdle(0);
+        config.setMaxWait(Duration.ofSeconds(30));
         config.setBlockWhenExhausted(true);
 
         return new GenericObjectPool<>(factory, config);
