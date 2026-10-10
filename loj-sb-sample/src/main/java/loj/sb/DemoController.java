@@ -10,7 +10,7 @@ import javax.print.PrintServiceLookup;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-//import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactoryBean;
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sun.star.comp.helper.BootstrapException;
+import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.IllegalArgumentException;
-import com.sun.star.uno.Exception;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.beans.PropertyValue;
 
@@ -29,6 +29,7 @@ import loj.my.Desktop;
 import loj.my.Doc;
 import loj.my.Sheet;
 
+import static loj.sb.pool.Pool.withConnector;
 import static loj.my.Util.*;
 import loj.tempuserdir.TempUserDirConnector;
 
@@ -37,13 +38,13 @@ public class DemoController {
     private static Logger logger = LoggerFactory.getLogger(DemoController.class);
 
     @Autowired
-    ProxyFactoryBean factory;
+    GenericObjectPool<TempUserDirConnector> pool;
     
     @Autowired
     IndexService indexService;
     @Autowired
     ChartService chartService;
-    
+
     void setResponse(HttpServletResponse response, Doc doc) throws com.sun.star.io.IOException, IOException {
         response.setContentType("application/vnd.ms-excel");
         response.addHeader("Content-Disposition", "attachment; filename=\"LojSbSample.xlsx\"");
@@ -74,58 +75,66 @@ public class DemoController {
     
     @RequestMapping(value="/", method=RequestMethod.GET)
     public void index(HttpServletResponse response) throws java.lang.Exception {
-        //TempUserDirConnector connector = (TempUserDirConnector) source.getTarget();
-        TempUserDirConnector connector = (TempUserDirConnector)factory.getObject();
-        logger.info("connector.key: " + connector.key);
-        XComponentContext context = connector.connect();
-        Desktop desktop = new Desktop(context);
-        //Util.writeType("proxy.properties", desktop, "desktop");
-        try (Doc origDoc = desktop.getDocFromResource("original.ods");
-                Doc newDoc = desktop.getNewDoc();) {
-            indexService.make(origDoc, newDoc);
-            setResponse(response, newDoc);
-        }
+        withConnector(pool, connector -> {
+            logger.info("connector.key: {}", connector.key);
+
+            XComponentContext context = connector.connect();
+            Desktop desktop = new Desktop(context);
+
+            try (Doc origDoc = desktop.getDocFromResource("original.ods");
+                 Doc newDoc = desktop.getNewDoc()) {
+                indexService.make(origDoc, newDoc);
+                setResponse(response, newDoc);
+            }
+        });
     }
 
     @RequestMapping(value="/pdf", method=RequestMethod.GET)
-    public void pdf(HttpServletResponse response) throws java.lang.Exception {
-        TempUserDirConnector connector = (TempUserDirConnector)factory.getObject();
-        logger.info("connector.key: " + connector.key);
-        XComponentContext context = connector.connect();
-        Desktop desktop = new Desktop(context);
-        try (Doc origDoc = desktop.getDocFromResource("original.ods");
-                Doc newDoc = desktop.getNewDoc();) {
-            indexService.make(origDoc, newDoc);
-            Sheet sheetToExport = newDoc.getActiveSheet();
-            setResponsePdf(response, newDoc, sheetToExport);
-        }
+    public void pdf(HttpServletResponse response) throws java.lang.Exception{
+        withConnector(pool, connector -> {
+            logger.info("connector.key: " + connector.key);
+
+            XComponentContext context = connector.connect();
+            Desktop desktop = new Desktop(context);
+
+            try (Doc origDoc = desktop.getDocFromResource("original.ods");
+                    Doc newDoc = desktop.getNewDoc();) {
+                indexService.make(origDoc, newDoc);
+                Sheet sheetToExport = newDoc.getActiveSheet();
+                setResponsePdf(response, newDoc, sheetToExport);
+            }
+        });
     }
 
     @RequestMapping(value="/chart", method=RequestMethod.GET)
     public void chart(HttpServletResponse response) throws IllegalArgumentException, IOException, BootstrapException, Exception {
-        TempUserDirConnector connector = (TempUserDirConnector)factory.getObject();
-        logger.info("connector.key: " + connector.key);
-        XComponentContext context = connector.connect();
-        Desktop desktop = new Desktop(context);
-        try (Doc doc = desktop.getNewDoc();) {
-            chartService.make(doc);
-            setResponse(response, doc);
-        }
+        withConnector(pool, connector -> {
+            logger.info("connector.key: " + connector.key);
+
+            XComponentContext context = connector.connect();
+            Desktop desktop = new Desktop(context);
+    
+            try (Doc doc = desktop.getNewDoc();) {
+                chartService.make(doc);
+                setResponse(response, doc);
+            }
+        });
     }
 
     @RequestMapping(value="/print", method=RequestMethod.GET)
     public void print(HttpServletResponse response) throws java.lang.Exception {
-        //TempUserDirConnector connector = (TempUserDirConnector) source.getTarget();
-        TempUserDirConnector connector = (TempUserDirConnector)factory.getObject();
-        logger.info("connector.key: " + connector.key);
-        XComponentContext context = connector.connect();
-        Desktop desktop = new Desktop(context);
-        //Util.writeType("proxy.properties", desktop, "desktop");
-        try (Doc origDoc = desktop.getDocFromResource("original.ods");
-                Doc newDoc = desktop.getNewDoc();) {
-            indexService.make(origDoc, newDoc);
-            PropertyValue[] pvs = getPropertyValueArray(Map.of("Wait", true)); 
-            newDoc.print(pvs);
-        }
+        withConnector(pool, connector -> {
+            logger.info("connector.key: " + connector.key);
+
+            XComponentContext context = connector.connect();
+            Desktop desktop = new Desktop(context);
+
+            try (Doc origDoc = desktop.getDocFromResource("original.ods");
+                    Doc newDoc = desktop.getNewDoc();) {
+                indexService.make(origDoc, newDoc);
+                PropertyValue[] pvs = getPropertyValueArray(Map.of("Wait", true)); 
+                newDoc.print(pvs);
+            }
+        });
     }
 }
