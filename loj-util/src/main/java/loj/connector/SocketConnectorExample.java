@@ -13,6 +13,10 @@ import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
+/**
+ * Example demonstrating how to use {@link SocketConnector} to connect to LibreOffice
+ * and convert a document to PDF.
+ */
 public class SocketConnectorExample {
     
     //private static final String OOO_EXEC_FOLDER = "C:/Program Files/LibreOffice/program/";
@@ -30,7 +34,7 @@ public class SocketConnectorExample {
      * Converts an OOo text document (.odt) to a PDF file using a
      * BootstrapConnector.
      * 
-     * @param args    The command line arguments
+     * @param args The command line arguments
      */
     public static void main(String[] args) {
         
@@ -58,6 +62,13 @@ public class SocketConnectorExample {
         }
     }
 
+    /**
+     * Converts a document using a default {@link SocketConnector}.
+     *
+     * @param loadUrl the source document URL
+     * @param storeUrl the destination document URL
+     * @throws Exception if conversion fails
+     */
     private static void convertWithStaticConnector(String loadUrl, String storeUrl) throws Exception, IllegalArgumentException, IOException, BootstrapException {
         LoServer server = new LoServer(OOO_EXEC_FOLDER);
         SocketConnector socketConnector = new SocketConnector(server);
@@ -68,6 +79,13 @@ public class SocketConnectorExample {
         convert(loadUrl, storeUrl, remoteContext);
     }
 
+    /**
+     * Converts a document using a customized {@link SocketConnector} with extra options.
+     *
+     * @param loadUrl the source document URL
+     * @param storeUrl the destination document URL
+     * @throws Exception if conversion fails
+     */
     private static void convertWithConnector(String loadUrl, String storeUrl) throws Exception, IllegalArgumentException, IOException, BootstrapException {
 
         // Create OOo server with additional -nofirststartwizard option
@@ -86,6 +104,16 @@ public class SocketConnectorExample {
         socketConnector.disconnect();
     }
 
+    /**
+     * Loads a document from loadUrl and stores it to storeUrl using writer_pdf_Export filter.
+     *
+     * @param loadUrl the source document URL
+     * @param storeUrl the destination document URL
+     * @param remoteContext the remote component context
+     * @throws IllegalArgumentException if arguments are invalid
+     * @throws IOException if an I/O error occurs
+     * @throws Exception if UNO conversion fails
+     */
     protected static void convert(String loadUrl, String storeUrl, XComponentContext remoteContext) throws IllegalArgumentException, IOException, Exception {
 
         XComponentLoader xcomponentloader = getComponentLoader(remoteContext);
@@ -101,6 +129,13 @@ public class SocketConnectorExample {
         xstorable.storeToURL(storeUrl, conversionProperties);
     }
 
+    /**
+     * Gets the component loader from the remote context.
+     *
+     * @param remoteContext the component context
+     * @return the {@link XComponentLoader}
+     * @throws Exception if desktop instance cannot be instantiated
+     */
     private static XComponentLoader getComponentLoader(XComponentContext remoteContext) throws Exception {
 
         XMultiComponentFactory remoteServiceManager = remoteContext.getServiceManager();

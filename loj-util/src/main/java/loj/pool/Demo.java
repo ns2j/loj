@@ -45,7 +45,24 @@ import com.sun.star.util.XCloseable;
 import loj.connector.PipeConnector;
 import loj.tempuserdir.TempUserDirConnector;
 
+/**
+ * Demonstrates creating a spreadsheet document with custom styles, data, and charts,
+ * using a pooled connection.
+ */
 public class Demo {
+
+    /**
+     * Executes the demonstration using the given connector.
+     * Connects to LibreOffice, creates a spreadsheet, inserts data, formats cells, creates a 3D chart,
+     * and saves the document as {@code test.ods}.
+     *
+     * @param connector the pipe connector to use
+     * @throws IllegalArgumentException if arguments are illegal
+     * @throws MalformedURLException if URL parsing fails
+     * @throws BootstrapException if bootstrapping fails
+     * @throws IOException if an I/O error occurs
+     * @throws com.sun.star.uno.Exception if a LibreOffice UNO error occurs
+     */
     protected static void make(PipeConnector connector) throws IllegalArgumentException, MalformedURLException, BootstrapException, IOException, com.sun.star.uno.Exception  {
         //oooooooooooooooooooooooooooStep 1oooooooooooooooooooooooooooooooooooooooooo
         // call UNO bootstrap method and get the remote component context form
@@ -275,6 +292,14 @@ public class Demo {
         System.out.println("done");
     }
 
+    /**
+     * Opens a new empty Calc (spreadsheet) document.
+     *
+     * @param xContext the component context
+     * @return the opened {@link XSpreadsheetDocument}
+     * @throws IllegalArgumentException if invalid arguments are supplied
+     * @throws com.sun.star.uno.Exception if opening the document fails
+     */
     public static XSpreadsheetDocument openCalc(XComponentContext xContext) throws IllegalArgumentException, com.sun.star.uno.Exception
     {
         //define variables
@@ -306,6 +331,16 @@ public class Demo {
     }
 
 
+    /**
+     * Inserts a value or formula into a spreadsheet cell.
+     *
+     * @param CellX the column index (0-based)
+     * @param CellY the row index (0-based)
+     * @param theValue the string representation of the value or formula
+     * @param TT1 the spreadsheet
+     * @param flag "V" to set as float value, otherwise sets as formula
+     * @throws IndexOutOfBoundsException if cell coordinates are out of bounds
+     */
     public static void insertIntoCell(int CellX, int CellY, String theValue,
             XSpreadsheet TT1, String flag) throws IndexOutOfBoundsException
     {
@@ -321,6 +356,21 @@ public class Demo {
 
     }
 
+    /**
+     * Changes the background style of a range of cells.
+     *
+     * @param x1 start column index
+     * @param y1 start row index
+     * @param x2 end column index
+     * @param y2 end row index
+     * @param template the cell style name to apply
+     * @param TT the spreadsheet
+     * @throws IndexOutOfBoundsException if coordinates are out of bounds
+     * @throws IllegalArgumentException if arguments are invalid
+     * @throws UnknownPropertyException if the property is unknown
+     * @throws PropertyVetoException if property change is vetoed
+     * @throws WrappedTargetException if an error occurs while setting the property
+     */
     public static void chgbColor( int x1, int y1, int x2, int y2,
             String template, XSpreadsheet TT ) throws IndexOutOfBoundsException, IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException
     {
@@ -335,6 +385,11 @@ public class Demo {
     }
 
 
+    /**
+     * Main method demonstrating borrowing a connector from the pool and generating a spreadsheet.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         GenericObjectPool<TempUserDirConnector> pool = null;
 

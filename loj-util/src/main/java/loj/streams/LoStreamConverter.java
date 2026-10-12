@@ -21,85 +21,106 @@ import com.sun.star.util.XCloseable;
 
 //import ooo.connector.BootstrapSocketConnector;
 
+/**
+ * Converts documents entirely in memory using streams via the LibreOffice UNO API.
+ */
 public class LoStreamConverter {
     private XComponentContext xComponentContext;
 
+    /**
+     * Constructs a {@code LoStreamConverter} using the provided component context.
+     *
+     * @param xComponentContext the remote or local component context
+     */
     public LoStreamConverter(XComponentContext xComponentContext) {
-	this.xComponentContext = xComponentContext;
+        this.xComponentContext = xComponentContext;
     }
 
+    /**
+     * Converts a document from the input stream to the output stream using the specified filter.
+     *
+     * @param input the input stream containing document data
+     * @param output the output stream to receive converted data
+     * @param filterName the LibreOffice export filter name (e.g., "writer_pdf_Export", "calc_pdf_Export")
+     * @throws Exception if a LibreOffice UNO error occurs during conversion
+     */
     public void convert(LoInputStream input, LoOutputStream output, String filterName) throws Exception {
-	XMultiComponentFactory xMultiComponentFactory = xComponentContext.getServiceManager();
-	Object desktopService = xMultiComponentFactory.createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
-	XComponentLoader xComponentLoader = UnoRuntime.queryInterface(XComponentLoader.class, desktopService);
+        XMultiComponentFactory xMultiComponentFactory = xComponentContext.getServiceManager();
+        Object desktopService = xMultiComponentFactory.createInstanceWithContext("com.sun.star.frame.Desktop", xComponentContext);
+        XComponentLoader xComponentLoader = UnoRuntime.queryInterface(XComponentLoader.class, desktopService);
 
-	PropertyValue[] conversionProperties = new PropertyValue[2];
-	conversionProperties[0] = new PropertyValue();
-	conversionProperties[1] = new PropertyValue();
+        PropertyValue[] conversionProperties = new PropertyValue[2];
+        conversionProperties[0] = new PropertyValue();
+        conversionProperties[1] = new PropertyValue();
 
-	conversionProperties[0].Name = "InputStream";
-	conversionProperties[0].Value = input;
-	conversionProperties[1].Name = "Hidden";
-	conversionProperties[1].Value = Boolean.TRUE;
+        conversionProperties[0].Name = "InputStream";
+        conversionProperties[0].Value = input;
+        conversionProperties[1].Name = "Hidden";
+        conversionProperties[1].Value = Boolean.TRUE;
 
-	XComponent document = xComponentLoader.loadComponentFromURL("private:stream", "_blank", 0, conversionProperties);
+        XComponent document = xComponentLoader.loadComponentFromURL("private:stream", "_blank", 0, conversionProperties);
 
-	conversionProperties[0].Name = "OutputStream";
-	conversionProperties[0].Value = output;
-	conversionProperties[1].Name = "FilterName";
-	conversionProperties[1].Value = filterName;
+        conversionProperties[0].Name = "OutputStream";
+        conversionProperties[0].Value = output;
+        conversionProperties[1].Name = "FilterName";
+        conversionProperties[1].Value = filterName;
 
-	XStorable xstorable = UnoRuntime.queryInterface(XStorable.class,document);
-	xstorable.storeToURL("private:stream", conversionProperties);
+        XStorable xstorable = UnoRuntime.queryInterface(XStorable.class,document);
+        xstorable.storeToURL("private:stream", conversionProperties);
 
-	XCloseable xclosable = UnoRuntime.queryInterface(XCloseable.class,document);
-	xclosable.close(true);
+        XCloseable xclosable = UnoRuntime.queryInterface(XCloseable.class,document);
+        xclosable.close(true);
     }
 
+    /**
+     * Command-line demonstration of in-memory conversion.
+     *
+     * @param args the command-line arguments
+     */
     public static void main(String[] args) {
-	//String oooExecutableFolder = "c:/program files/openoffice.org 2.3/program/";
-	//String inputFilename = "c:/temp/text.odt";
-	//String outputFilename = "c:/temp/text.pdf";
-	String inputFilename = "loprac.xls";
-	String outputFilename = "loprac.pdf";
+        //String oooExecutableFolder = "c:/program files/openoffice.org 2.3/program/";
+        //String inputFilename = "c:/temp/text.odt";
+        //String outputFilename = "c:/temp/text.pdf";
+        String inputFilename = "loprac.xls";
+        String outputFilename = "loprac.pdf";
 
-	try {
-	    // Connect to OOo server
-	    //XComponentContext xComponentContext = BootstrapSocketConnector.bootstrap(oooExecutableFolder);
-	    XComponentContext xComponentContext = Bootstrap.bootstrap();
-	    LoStreamConverter converter = new LoStreamConverter(xComponentContext);
+        try {
+            // Connect to OOo server
+            //XComponentContext xComponentContext = BootstrapSocketConnector.bootstrap(oooExecutableFolder);
+            XComponentContext xComponentContext = Bootstrap.bootstrap();
+            LoStreamConverter converter = new LoStreamConverter(xComponentContext);
 
-	    // Create OOoInputStream
-	    InputStream inputFile = new BufferedInputStream(new FileInputStream(inputFilename));
-	    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-	    byte[] byteBuffer = new byte[4096];
-	    int byteBufferLength = 0;
-	    while ((byteBufferLength = inputFile.read(byteBuffer)) > 0) {
-		bytes.write(byteBuffer,0,byteBufferLength);
-	    }
-	    inputFile.close();
-	    LoInputStream inputStream = new LoInputStream(bytes.toByteArray());
+            // Create OOoInputStream
+            InputStream inputFile = new BufferedInputStream(new FileInputStream(inputFilename));
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            byte[] byteBuffer = new byte[4096];
+            int byteBufferLength = 0;
+            while ((byteBufferLength = inputFile.read(byteBuffer)) > 0) {
+                bytes.write(byteBuffer,0,byteBufferLength);
+            }
+            inputFile.close();
+            LoInputStream inputStream = new LoInputStream(bytes.toByteArray());
 
-	    // Create OOoOutputStream
-	    LoOutputStream outputStream = new LoOutputStream();
+            // Create OOoOutputStream
+            LoOutputStream outputStream = new LoOutputStream();
 
-	    // Convert document to PDF
-	    converter.convert(inputStream, outputStream, "writer_pdf_Export");
+            // Convert document to PDF
+            converter.convert(inputStream, outputStream, "writer_pdf_Export");
 
-	    // Save OOoOutputStream
-	    FileOutputStream outputFile = new FileOutputStream(outputFilename);
-	    outputFile.write(outputStream.toByteArray());
-	    outputFile.close();
-	} catch (BootstrapException e) {
-	    System.err.println("Connection not available");
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    System.err.println("File error");
-	    e.printStackTrace();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+            // Save OOoOutputStream
+            FileOutputStream outputFile = new FileOutputStream(outputFilename);
+            outputFile.write(outputStream.toByteArray());
+            outputFile.close();
+        } catch (BootstrapException e) {
+            System.err.println("Connection not available");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("File error");
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	System.exit(0);
+        System.exit(0);
     }
 }

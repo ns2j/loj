@@ -46,7 +46,7 @@ public class ConnectorBase {
      * Constructs a bootstrap connector which uses the folder of the lo
      * installation containing the soffice executable.
      * 
-     * @param   loExecFoder   The folder of the lo installation containing the soffice executable
+     * @param   loExecFolder   The folder of the lo installation containing the soffice executable
      */
     public ConnectorBase(String loExecFolder) {
         
@@ -90,12 +90,12 @@ public class ConnectorBase {
      * 
      * @param   acceptOption       The accept option
      * @param   connectionString   The connection string
-     * @return                        The component context
-     * @throws BootstrapException 
-     * @throws IOException 
-     * @throws MalformedURLException 
-     * @throws ConnectionSetupException 
-     * @throws IllegalArgumentException 
+     * @return                     The component context
+     * @throws  BootstrapException if bootstrapping fails
+     * @throws  IOException        if an I/O error occurs
+     * @throws  MalformedURLException if connection URL is malformed
+     * @throws  ConnectionSetupException if connection setup fails
+     * @throws  IllegalArgumentException if arguments are invalid
      */
     public XComponentContext connect(String acceptOption, String connectionString) throws BootstrapException, MalformedURLException, IOException, IllegalArgumentException, ConnectionSetupException {
 
@@ -178,6 +178,7 @@ public class ConnectorBase {
      * Create default local component context.
      * 
      * @return      The default local component context
+     * @throws      BootstrapException if local context creation fails
      */
     private XComponentContext getLocalContext() throws BootstrapException {
 	XComponentContext xLocalContext;
@@ -195,11 +196,12 @@ public class ConnectorBase {
     /**
      * Try to connect to office.
      * 
+     * @param       xUrlResolver the URL resolver
      * @return      The remote component context
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws java.lang.IllegalArgumentException 
-     * @throws IllegalAccessException 
+     * @throws      BootstrapException if connection resolution fails
+     * @throws      ConnectionSetupException if connection cannot be set up
+     * @throws      IllegalArgumentException if arguments are invalid
+     * @throws      NoConnectException if connection cannot be established
      */
     private XComponentContext getRemoteContext(XUnoUrlResolver xUrlResolver) throws BootstrapException, ConnectionSetupException, IllegalArgumentException, NoConnectException  {
         Object context = xUrlResolver.resolve(connectionString);

@@ -35,14 +35,15 @@ public class SocketConnector extends ConnectorBase {
     }
 
     /**
-     * Connects to an OOo server using a default socket and returns a
+     * Connects to an OOo server using a default socket on localhost:8100 and returns a
      * component context for using the connection to the OOo server.
      * 
      * @return             The component context
-     * @throws IOException 
-     * @throws ConnectionSetupException 
-     * @throws MalformedURLException 
-     * @throws IllegalArgumentException 
+     * @throws BootstrapException if bootstrapping fails
+     * @throws IOException if an I/O error occurs
+     * @throws ConnectionSetupException if connection setup fails
+     * @throws MalformedURLException if URL cannot be parsed
+     * @throws IllegalArgumentException if arguments are invalid
      */
     public XComponentContext connect() throws BootstrapException, IllegalArgumentException, MalformedURLException, ConnectionSetupException, IOException {
 
@@ -61,10 +62,11 @@ public class SocketConnector extends ConnectorBase {
      * @param   host   The host
      * @param   port   The port
      * @return         The component context
-     * @throws IOException 
-     * @throws ConnectionSetupException 
-     * @throws MalformedURLException 
-     * @throws IllegalArgumentException 
+     * @throws BootstrapException if bootstrapping fails
+     * @throws IOException if an I/O error occurs
+     * @throws ConnectionSetupException if connection setup fails
+     * @throws MalformedURLException if URL cannot be parsed
+     * @throws IllegalArgumentException if arguments are invalid
      */
     public XComponentContext connect(String host, int port) throws BootstrapException, IllegalArgumentException, MalformedURLException, ConnectionSetupException, IOException {
 

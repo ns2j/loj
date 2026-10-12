@@ -17,15 +17,42 @@ import com.sun.star.uno.XComponentContext;
  * http://www.oooforum.org/forum/viewtopic.phtml?t=40263&highlight=named+pipe.
  */
 public class PipeConnector extends ConnectorBase {
+
+    /**
+     * Constructs a {@code PipeConnector} targeting the given {@link LoServer}.
+     *
+     * @param server the server instance to connect to
+     */
     public PipeConnector(LoServer server) {
         super(server);
     }
 
+    /**
+     * Connects to the server using a randomly generated named pipe.
+     *
+     * @return the remote {@link XComponentContext}
+     * @throws IllegalArgumentException if arguments are invalid
+     * @throws MalformedURLException if URL cannot be formed
+     * @throws ConnectionSetupException if setting up connection fails
+     * @throws BootstrapException if bootstrapping fails
+     * @throws IOException if an I/O error occurs
+     */
     public XComponentContext connect() throws IllegalArgumentException, MalformedURLException, ConnectionSetupException, BootstrapException, IOException {
         String pipeName = "uno" + Long.toString((new Random()).nextLong() & 0x7fffffffffffffffL);
         return connect(pipeName);
     }
     
+    /**
+     * Connects to the server using the specified pipe name.
+     *
+     * @param pipeName the name of the pipe to connect with
+     * @return the remote {@link XComponentContext}
+     * @throws IllegalArgumentException if arguments are invalid
+     * @throws MalformedURLException if URL cannot be formed
+     * @throws ConnectionSetupException if setting up connection fails
+     * @throws BootstrapException if bootstrapping fails
+     * @throws IOException if an I/O error occurs
+     */
     public XComponentContext connect(String pipeName) throws IllegalArgumentException, MalformedURLException, ConnectionSetupException, BootstrapException, IOException {
         String oooAcceptOption = "--accept=pipe,name=" + pipeName + ";urp;";
 

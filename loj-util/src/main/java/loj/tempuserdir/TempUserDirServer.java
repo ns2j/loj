@@ -8,10 +8,27 @@ import java.util.UUID;
 
 import loj.connector.LoServer;
 
-public class TempUserDirServer extends LoServer{
+/**
+ * A LibreOffice server instance that uses an isolated, temporary user installation directory.
+ * <p>
+ * This prevents conflicts when running multiple concurrent LibreOffice processes
+ * by isolating their user configuration profiles.
+ */
+public class TempUserDirServer extends LoServer {
+
+    /** Subdirectory under the temporary directory used for UNO profiles. */
     public String TEMP_APP_DIR = "/uno/";
+
+    /** Unique identifier for this server instance. */
     public String key = null;
 
+    /**
+     * Constructs a {@code TempUserDirServer} instance with a unique temporary user profile directory.
+     * Configures the server with headless and non-interactive startup options.
+     *
+     * @param oooExecFolder the directory containing the LibreOffice executable
+     * @throws MalformedURLException if the URL of the temporary profile directory cannot be created
+     */
     public TempUserDirServer(String oooExecFolder) throws MalformedURLException {
         super(oooExecFolder);
         key = UUID.randomUUID().toString();
@@ -34,6 +51,11 @@ public class TempUserDirServer extends LoServer{
         setOptions(o);    
     }
 
+    /**
+     * Returns the temporary user directory associated with this server instance.
+     *
+     * @return the {@link File} object representing the temporary directory
+     */
     public File getTempUserDir() {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         File tmpAppDir = new File(tmpDir, TEMP_APP_DIR);
@@ -42,6 +64,11 @@ public class TempUserDirServer extends LoServer{
         return new File(tmpAppDir, key);
     }
 
+    /**
+     * Recursively deletes a file or directory.
+     *
+     * @param f the file or directory to delete
+     */
     protected void deleteDir(File f) {
         if (!f.exists()) return;
         if (f.isFile()) f.delete();
@@ -52,6 +79,10 @@ public class TempUserDirServer extends LoServer{
             f.delete();
         }
     }
+
+    /**
+     * Kills the LibreOffice process and deletes its associated temporary user directory.
+     */
     @Override
     public void kill() {
         System.out.println("kill key: " + key);

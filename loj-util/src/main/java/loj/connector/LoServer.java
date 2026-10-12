@@ -66,6 +66,11 @@ public class LoServer {
         this.loOptions = loOptions;
     }
     
+    /**
+     * Sets the options to pass to the LibreOffice process on startup.
+     *
+     * @param options the list of command line options
+     */
     public void setOptions(List<String> options) {
         loOptions = options;
     }
@@ -87,6 +92,9 @@ public class LoServer {
      * - accept option    : -accept=pipe,name=loPipe;urp;
      * 
      * @param   loAcceptOption      The accept option
+     * @throws  BootstrapException  if the office executable cannot be found
+     * @throws  IOException         if an I/O error occurs starting the process
+     * @throws  MalformedURLException if the executable folder URL is malformed
      */
     public void start(String loAcceptOption) throws BootstrapException, IOException, MalformedURLException {
 
