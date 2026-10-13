@@ -89,9 +89,13 @@ public class PoolManager {
     /**
      * Executes an action using the specified connector pool.
      *
+     * The connector is returned after normal completion.
+     * It is invalidated when a connection-related exception or an Error
+     * occurs. Cleanup failures are suppressed when the action itself fails.
+     *
      * @param targetPool pool from which to borrow a connector
      * @param action action to execute
-     * @throws Exception if borrowing the connector or executing the action fails
+     * @throws Exception if borrowing or executing the action fails
      */
     public static void withConnector(
             GenericObjectPool<TempUserDirConnector> targetPool,
@@ -99,31 +103,58 @@ public class PoolManager {
 
         TempUserDirConnector connector = targetPool.borrowObject();
         boolean invalidate = false;
+        Throwable primaryFailure = null;
 
         try {
             action.execute(connector);
-        } catch (Exception e) {
-            Throwable cause = e;
+        } catch (Exception | Error e) {
+            primaryFailure = e;
 
-            while (cause != null) {
-                if (cause instanceof com.sun.star.lang.DisposedException
-                        || cause instanceof com.sun.star.connection.NoConnectException
-                        || cause instanceof com.sun.star.connection.ConnectionSetupException) {
-                    invalidate = true;
-                    break;
-                }
-
-                cause = cause.getCause();
-            }
+            // An Error leaves the connector's state uncertain.
+            invalidate = e instanceof Error || isConnectionFailure(e);
 
             throw e;
         } finally {
-            if (invalidate) {
-                targetPool.invalidateObject(connector);
-            } else {
-                targetPool.returnObject(connector);
+            try {
+                if (invalidate) {
+                    targetPool.invalidateObject(connector);
+                } else {
+                    targetPool.returnObject(connector);
+                }
+            } catch (Exception | Error cleanupFailure) {
+                if (primaryFailure != null) {
+                    // Preserve the original action failure.
+                    primaryFailure.addSuppressed(cleanupFailure);
+                } else {
+                    // No earlier failure: propagate the cleanup failure.
+                    throw cleanupFailure;
+                }
             }
         }
+    }
+
+    /**
+     * Checks whether an exception or one of its causes indicates
+     * that the connector should not be reused.
+     *
+     * @param exception the exception to inspect
+     * @return true if the connector should be invalidated
+     */
+    private static boolean isConnectionFailure(Throwable exception) {
+        Throwable cause = exception;
+
+        while (cause != null) {
+            if (cause instanceof com.sun.star.lang.DisposedException
+                    || cause instanceof com.sun.star.connection.NoConnectException
+                    || cause instanceof com.sun.star.connection.ConnectionSetupException
+                    || cause instanceof com.sun.star.comp.helper.BootstrapException) {
+                return true;
+            }
+
+            cause = cause.getCause();
+        }
+
+        return false;
     }
 
     /**
