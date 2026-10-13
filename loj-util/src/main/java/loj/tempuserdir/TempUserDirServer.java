@@ -53,7 +53,7 @@ public class TempUserDirServer extends LoServer {
         o.add("--invisible");
         o.add("--headless");
         //}
-        setOptions(o);    
+        setOptions(o);
     }
 
     /**
@@ -70,11 +70,42 @@ public class TempUserDirServer extends LoServer {
     }
 
     /**
-     * Recursively deletes a file or directory.
+     * Deletes a file or directory tree, retrying the whole tree in case entries
+     * remain or appear while a previous deletion pass is in progress.
      *
      * @param f the file or directory to delete
      */
     protected void deleteDir(File f) {
+        for (int attempt = 1; attempt <= DELETE_RETRIES; attempt++) {
+            deleteTree(f, attempt == DELETE_RETRIES);
+            if (!f.exists()) {
+                return;
+            }
+            if (attempt < DELETE_RETRIES) {
+                try {
+                    Thread.sleep(DELETE_RETRY_DELAY_MILLIS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("Interrupted while deleting temporary user directory: " + f);
+                    break;
+                }
+            }
+        }
+
+        if (f.exists()) {
+            System.err.println("Failed to delete temporary user directory after "
+                    + DELETE_RETRIES + " pass(es): " + f);
+            logRemainingEntries(f);
+        }
+    }
+
+    /**
+     * Performs one recursive deletion pass.
+     *
+     * @param f the file or directory to delete
+     * @param logErrors whether to log individual deletion errors
+     */
+    private void deleteTree(File f, boolean logErrors) {
         if (!f.exists()) {
             return;
         }
@@ -82,66 +113,39 @@ public class TempUserDirServer extends LoServer {
         if (f.isDirectory()) {
             File[] files = f.listFiles();
             if (files == null) {
-                System.err.println("Unable to list directory for deletion: " + f
-                        + " (check permissions and whether the directory is still accessible)");
+                if (logErrors) {
+                    System.err.println("Unable to list directory for deletion: " + f
+                            + " (check permissions and whether the directory is still accessible)");
+                }
                 return;
             }
             for (File child : files) {
-                deleteDir(child);
+                deleteTree(child, logErrors);
             }
         }
 
-        deleteWithRetry(f);
-    }
-
-    /**
-     * Retries deletion briefly because LibreOffice may still be finishing profile cleanup.
-     * Reports the underlying I/O error and remaining directory entries if deletion fails.
-     *
-     * @param f the file or directory to delete
-     */
-    private void deleteWithRetry(File f) {
-        IOException lastError = null;
-        int attempts = 0;
-
-        for (int attempt = 1; attempt <= DELETE_RETRIES; attempt++) {
-            attempts = attempt;
-            try {
-                Files.deleteIfExists(f.toPath());
-                return;
-            } catch (IOException e) {
-                lastError = e;
-                if (attempt == DELETE_RETRIES) {
-                    break;
-                }
-                try {
-                    Thread.sleep(DELETE_RETRY_DELAY_MILLIS);
-                } catch (InterruptedException interrupted) {
-                    Thread.currentThread().interrupt();
-                    lastError = new IOException(
-                            "Interrupted while retrying deletion", interrupted);
-                    break;
-                }
+        try {
+            Files.deleteIfExists(f.toPath());
+        } catch (IOException e) {
+            if (logErrors) {
+                System.err.println("Unable to delete entry: " + f + " ("
+                        + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
             }
-        }
-
-        if (lastError != null && f.exists()) {
-            System.err.println("Failed to delete after " + attempts + " attempt(s): "
-                    + f + " (" + lastError.getClass().getSimpleName()
-                    + ": " + lastError.getMessage() + ")");
-            logRemainingEntries(f);
         }
     }
 
     /**
-     * Logs the entries still present when deletion fails.
+     * Logs all entries still present when deletion fails.
      *
      * @param f the file or directory that could not be deleted
      */
     private void logRemainingEntries(File f) {
+        if (!f.exists()) {
+            return;
+        }
         if (!f.isDirectory()) {
-            System.err.println("  Remaining entry: " + f
-                    + " (file, size=" + f.length() + " bytes"
+            System.err.println("  Remaining file: " + f
+                    + " (size=" + f.length() + " bytes"
                     + ", lastModified=" + f.lastModified() + ")");
             return;
         }
@@ -158,10 +162,13 @@ public class TempUserDirServer extends LoServer {
 
         System.err.println("  Remaining entries in " + f + ":");
         for (File child : children) {
-            String type = child.isDirectory() ? "directory" : "file";
-            System.err.println("    " + type + ": " + child
-                    + (child.isFile() ? " (size=" + child.length()
-                            + " bytes, lastModified=" + child.lastModified() + ")" : ""));
+            if (child.isDirectory()) {
+                System.err.println("    directory: " + child);
+                logRemainingEntries(child);
+            } else {
+                System.err.println("    file: " + child + " (size=" + child.length()
+                        + " bytes, lastModified=" + child.lastModified() + ")");
+            }
         }
     }
 
