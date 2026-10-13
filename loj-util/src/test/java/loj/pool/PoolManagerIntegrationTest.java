@@ -112,4 +112,60 @@ class PoolManagerIntegrationTest {
             pool.close();
         }
     }
+
+    @Test
+    @EnabledIfSystemProperty(named = "loj.integrationTests", matches = "true")
+    void connectorIsReusedAcrossRepeatedBorrowAndReturnCycles()
+            throws Exception {
+
+        Assumptions.assumeTrue(
+                System.getenv("LO_EXEC_PATH") != null
+                        || System.getProperty("lo.execFolder") != null,
+                "Set LO_EXEC_PATH or -Dlo.execFolder to the LibreOffice program directory");
+
+        GenericObjectPoolConfig<TempUserDirConnector> config =
+                new GenericObjectPoolConfig<>();
+        config.setMaxTotal(1);
+        config.setMaxIdle(1);
+        config.setMinIdle(0);
+        config.setMaxWaitMillis(30_000L);
+        config.setBlockWhenExhausted(true);
+
+        GenericObjectPool<TempUserDirConnector> pool =
+                PoolManager.createPool(config);
+        AtomicReference<TempUserDirConnector> firstConnector =
+                new AtomicReference<>();
+
+        try {
+            // Repeatedly borrow and return the same live connector.
+            for (int i = 0; i < 10; i++) {
+                final int iteration = i;
+                PoolManager.withConnector(pool, connector -> {
+                    if (iteration == 0) {
+                        firstConnector.set(connector);
+                    } else {
+                        assertSame(firstConnector.get(), connector,
+                                "The pool should reuse the connector on cycle " + iteration);
+                    }
+
+                    XComponentContext context = connector.connect();
+                    assertNotNull(context,
+                            "UNO context should remain available on cycle " + iteration);
+                    Object desktop = context.getServiceManager()
+                            .createInstanceWithContext(
+                                    "com.sun.star.frame.Desktop", context);
+                    assertNotNull(desktop,
+                            "Desktop service should remain available on cycle " + iteration);
+                });
+
+                assertEquals(0, pool.getNumActive(),
+                        "No connector should remain borrowed after cycle " + iteration);
+                assertEquals(1, pool.getNumIdle(),
+                        "One connector should be idle after cycle " + iteration);
+            }
+        } finally {
+            pool.close();
+        }
+    }
+
 }
