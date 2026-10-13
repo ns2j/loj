@@ -146,33 +146,41 @@ public class ConnectorBase {
      * If there has been a previous connect, disconnect tries to terminate
      * the lo server and kills the lo server process the connect started.
      */
+
     public void disconnect() {
-        if (connectionString == null)
-            return;
-
-        // call office to terminate itself
         try {
-            // get local context
-            XComponentContext xLocalContext = getLocalContext();
+            if (connectionString != null) {
+                try {
+                    XComponentContext xLocalContext = getLocalContext();
+                    XUnoUrlResolver xUrlResolver =
+                            UnoUrlResolver.create(xLocalContext);
+                    XComponentContext xRemoteContext =
+                            getRemoteContext(xUrlResolver);
 
-            // create a URL resolver
-            XUnoUrlResolver xUrlResolver = UnoUrlResolver.create(xLocalContext);
+                    Object desktop = xRemoteContext.getServiceManager()
+                            .createInstanceWithContext(
+                                    "com.sun.star.frame.Desktop",
+                                    xRemoteContext);
 
-            // get remote context
-            XComponentContext xRemoteContext = getRemoteContext(xUrlResolver);
+                    XDesktop xDesktop =
+                            UnoRuntime.queryInterface(XDesktop.class, desktop);
 
-            // get desktop to terminate office
-            Object desktop = xRemoteContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop",xRemoteContext);
-            XDesktop xDesktop = UnoRuntime.queryInterface(XDesktop.class, desktop);
-            xDesktop.terminate();
+                    if (xDesktop != null) {
+                        xDesktop.terminate();
+                    }
+                } catch (Exception e) {
+                    // Continue with process cleanup even if UNO termination fails.
+                }
+            }
+        } finally {
+            try {
+                server.kill();
+            } finally {
+                connectionString = null;
+            }
         }
-        catch (Exception e) {
-            // Bad luck, unable to terminate office
-        }
-
-        server.kill();
-        connectionString = null;
     }
+
 
     /**
      * Create default local component context.

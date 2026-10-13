@@ -70,13 +70,21 @@ public class TempUserDirServer extends LoServer {
      * @param f the file or directory to delete
      */
     protected void deleteDir(File f) {
-        if (!f.exists()) return;
-        if (f.isFile()) f.delete();
+        if (!f.exists()) {
+            return;
+        }
+
         if (f.isDirectory()) {
             File[] files = f.listFiles();
-            for(int i = 0; i < files.length; i++)
-                deleteDir( files[i] );
-            f.delete();
+            if (files != null) {
+                for (File child : files) {
+                    deleteDir(child);
+                }
+            }
+        }
+
+        if (!f.delete() && f.exists()) {
+            System.err.println("Failed to delete: " + f);
         }
     }
 

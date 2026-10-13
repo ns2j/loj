@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -137,10 +138,25 @@ public class LoServer {
      * 
      * If there has been a previous start, kill destroys the process.
      */
+
     public void kill() {
-        if (loProcess != null) {
-            loProcess.destroy();
-            loProcess = null;
+        Process process = loProcess;
+        loProcess = null;
+
+        if (process == null) {
+            return;
+        }
+
+        process.destroy();
+
+        try {
+            if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                process.destroyForcibly();
+                process.waitFor(5, TimeUnit.SECONDS);
+            }
+        } catch (InterruptedException e) {
+            process.destroyForcibly();
+            Thread.currentThread().interrupt();
         }
     }
 
