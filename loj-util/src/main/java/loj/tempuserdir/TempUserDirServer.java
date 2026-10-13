@@ -96,7 +96,7 @@ public class TempUserDirServer extends LoServer {
 
     /**
      * Retries deletion briefly because LibreOffice may still be finishing profile cleanup.
-     * Reports the underlying I/O error so a failed cleanup can be diagnosed.
+     * Reports the underlying I/O error and remaining directory entries if deletion fails.
      *
      * @param f the file or directory to delete
      */
@@ -129,6 +129,39 @@ public class TempUserDirServer extends LoServer {
             System.err.println("Failed to delete after " + attempts + " attempt(s): "
                     + f + " (" + lastError.getClass().getSimpleName()
                     + ": " + lastError.getMessage() + ")");
+            logRemainingEntries(f);
+        }
+    }
+
+    /**
+     * Logs the entries still present when deletion fails.
+     *
+     * @param f the file or directory that could not be deleted
+     */
+    private void logRemainingEntries(File f) {
+        if (!f.isDirectory()) {
+            System.err.println("  Remaining entry: " + f
+                    + " (file, size=" + f.length() + " bytes"
+                    + ", lastModified=" + f.lastModified() + ")");
+            return;
+        }
+
+        File[] children = f.listFiles();
+        if (children == null) {
+            System.err.println("  Unable to list remaining entries in: " + f);
+            return;
+        }
+        if (children.length == 0) {
+            System.err.println("  Directory is empty now; it may have changed during deletion: " + f);
+            return;
+        }
+
+        System.err.println("  Remaining entries in " + f + ":");
+        for (File child : children) {
+            String type = child.isDirectory() ? "directory" : "file";
+            System.err.println("    " + type + ": " + child
+                    + (child.isFile() ? " (size=" + child.length()
+                            + " bytes, lastModified=" + child.lastModified() + ")" : ""));
         }
     }
 
