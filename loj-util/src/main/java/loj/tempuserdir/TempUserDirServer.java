@@ -2,6 +2,8 @@ package loj.tempuserdir;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +17,9 @@ import loj.connector.LoServer;
  * by isolating their user configuration profiles.
  */
 public class TempUserDirServer extends LoServer {
+
+    private static final int DELETE_RETRIES = 5;
+    private static final long DELETE_RETRY_DELAY_MILLIS = 200L;
 
     /** Subdirectory under the temporary directory used for UNO profiles. */
     public String TEMP_APP_DIR = "/uno/";
@@ -76,15 +81,54 @@ public class TempUserDirServer extends LoServer {
 
         if (f.isDirectory()) {
             File[] files = f.listFiles();
-            if (files != null) {
-                for (File child : files) {
-                    deleteDir(child);
+            if (files == null) {
+                System.err.println("Unable to list directory for deletion: " + f
+                        + " (check permissions and whether the directory is still accessible)");
+                return;
+            }
+            for (File child : files) {
+                deleteDir(child);
+            }
+        }
+
+        deleteWithRetry(f);
+    }
+
+    /**
+     * Retries deletion briefly because LibreOffice may still be finishing profile cleanup.
+     * Reports the underlying I/O error so a failed cleanup can be diagnosed.
+     *
+     * @param f the file or directory to delete
+     */
+    private void deleteWithRetry(File f) {
+        IOException lastError = null;
+        int attempts = 0;
+
+        for (int attempt = 1; attempt <= DELETE_RETRIES; attempt++) {
+            attempts = attempt;
+            try {
+                Files.deleteIfExists(f.toPath());
+                return;
+            } catch (IOException e) {
+                lastError = e;
+                if (attempt == DELETE_RETRIES) {
+                    break;
+                }
+                try {
+                    Thread.sleep(DELETE_RETRY_DELAY_MILLIS);
+                } catch (InterruptedException interrupted) {
+                    Thread.currentThread().interrupt();
+                    lastError = new IOException(
+                            "Interrupted while retrying deletion", interrupted);
+                    break;
                 }
             }
         }
 
-        if (!f.delete() && f.exists()) {
-            System.err.println("Failed to delete: " + f);
+        if (lastError != null && f.exists()) {
+            System.err.println("Failed to delete after " + attempts + " attempt(s): "
+                    + f + " (" + lastError.getClass().getSimpleName()
+                    + ": " + lastError.getMessage() + ")");
         }
     }
 
