@@ -391,25 +391,13 @@ public class Demo {
      * @param args command-line arguments
      */
     public static void main(String[] args) {
-        GenericObjectPool<TempUserDirConnector> pool = null;
-
         try {
-            pool = PoolManager.getPool();
-        } catch (BootstrapException e) {
+            PoolManager.withConnector(connector -> {
+                System.out.println("connector.server.key: " + connector.key);
+                make(connector);
+            });
+        } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
-        TempUserDirConnector connector = null;
-        try {
-            connector = pool.borrowObject();
-            System.out.println("connector.server.key: " + connector.key);
-            make(connector);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        } finally {
-            pool.returnObject(connector);
-        }
-        System.exit(0);
     }
-
 }

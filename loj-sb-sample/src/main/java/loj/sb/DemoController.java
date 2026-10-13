@@ -28,9 +28,9 @@ import loj.my.Desktop;
 import loj.my.Doc;
 import loj.my.Sheet;
 
-import static loj.sb.pool.Pool.withConnector;
-import static loj.my.Util.*;
+import loj.pool.PoolManager;
 import loj.tempuserdir.TempUserDirConnector;
+import static loj.my.Util.*;
 
 @RestController
 public class DemoController {
@@ -74,7 +74,7 @@ public class DemoController {
     
     @RequestMapping(value="/", method=RequestMethod.GET)
     public void index(HttpServletResponse response) throws java.lang.Exception {
-        withConnector(pool, connector -> {
+        PoolManager.withConnector(pool, connector -> {
             logger.info("connector.key: {}", connector.key);
 
             XComponentContext context = connector.connect();
@@ -90,7 +90,7 @@ public class DemoController {
 
     @RequestMapping(value="/pdf", method=RequestMethod.GET)
     public void pdf(HttpServletResponse response) throws java.lang.Exception{
-        withConnector(pool, connector -> {
+        PoolManager.withConnector(pool, connector -> {
             logger.info("connector.key: " + connector.key);
 
             XComponentContext context = connector.connect();
@@ -107,7 +107,7 @@ public class DemoController {
 
     @RequestMapping(value="/chart", method=RequestMethod.GET)
     public void chart(HttpServletResponse response) throws IllegalArgumentException, IOException, BootstrapException, Exception {
-        withConnector(pool, connector -> {
+        PoolManager.withConnector(pool, connector -> {
             logger.info("connector.key: " + connector.key);
 
             XComponentContext context = connector.connect();
@@ -122,7 +122,7 @@ public class DemoController {
 
     @RequestMapping(value="/print", method=RequestMethod.GET)
     public void print(HttpServletResponse response) throws java.lang.Exception {
-        withConnector(pool, connector -> {
+        PoolManager.withConnector(pool, connector -> {
             logger.info("connector.key: " + connector.key);
 
             XComponentContext context = connector.connect();
