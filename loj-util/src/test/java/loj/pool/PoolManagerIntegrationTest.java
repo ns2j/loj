@@ -2,7 +2,6 @@ package loj.pool;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -43,7 +42,7 @@ class PoolManagerIntegrationTest {
         config.setMaxTotal(1);
         config.setMaxIdle(1);
         config.setMinIdle(0);
-        config.setMaxWait(Duration.ofSeconds(30));
+        config.setMaxWaitMillis(30_000L);
         config.setBlockWhenExhausted(true);
 
         GenericObjectPool<TempUserDirConnector> pool =
