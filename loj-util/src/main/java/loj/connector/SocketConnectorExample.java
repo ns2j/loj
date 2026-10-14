@@ -1,5 +1,7 @@
 package loj.connector;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.List;
 
 import com.sun.star.beans.PropertyValue;
@@ -18,6 +20,9 @@ import com.sun.star.uno.XComponentContext;
  * and convert a document to PDF.
  */
 public class SocketConnectorExample {
+
+    private static final Logger LOGGER =
+            System.getLogger(SocketConnectorExample.class.getName());
     
     //private static final String OOO_EXEC_FOLDER = "C:/Program Files/LibreOffice/program/";
     private static final String OOO_EXEC_FOLDER = "/usr/lib64/libreoffice/program/";
@@ -51,11 +56,10 @@ public class SocketConnectorExample {
             convertWithConnector(loadUrl, storeUrl);
         }
         catch (NoConnectException e) {
-            System.out.println("OOo is not responding");
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "OOo is not responding", e);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Error during document conversion", e);
         }
         finally {
             System.exit(0);

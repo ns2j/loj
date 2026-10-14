@@ -7,6 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.comp.helper.BootstrapException;
@@ -25,6 +28,10 @@ import com.sun.star.util.XCloseable;
  * Converts documents entirely in memory using streams via the LibreOffice UNO API.
  */
 public class LoStreamConverter {
+
+    private static final Logger LOGGER =
+            System.getLogger(LoStreamConverter.class.getName());
+
     private XComponentContext xComponentContext;
 
     /**
@@ -112,13 +119,11 @@ public class LoStreamConverter {
             outputFile.write(outputStream.toByteArray());
             outputFile.close();
         } catch (BootstrapException e) {
-            System.err.println("Connection not available");
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Connection not available", e);
         } catch (IOException e) {
-            System.err.println("File error");
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "File error", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Conversion error", e);
         }
 
         System.exit(0);

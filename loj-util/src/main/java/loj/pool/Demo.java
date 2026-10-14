@@ -42,6 +42,9 @@ import com.sun.star.uno.XComponentContext;
 import com.sun.star.uno.XInterface;
 import com.sun.star.util.XCloseable;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import loj.connector.PipeConnector;
 import loj.tempuserdir.TempUserDirConnector;
 
@@ -50,6 +53,9 @@ import loj.tempuserdir.TempUserDirConnector;
  * using a pooled connection.
  */
 public class Demo {
+
+    private static final Logger LOGGER =
+            System.getLogger(Demo.class.getName());
 
     /**
      * Executes the demonstration using the given connector.
@@ -71,7 +77,7 @@ public class Demo {
         XComponentContext xContext = connector.connect();
 
         // get the remote office component context
-        System.out.println("Connected to a running office ...");
+        LOGGER.log(Level.INFO, "Connected to a running office ...");
 
         //oooooooooooooooooooooooooooStep 2oooooooooooooooooooooooooooooooooooooooooo
         // open an empty document. In this case it's a calc document.
@@ -86,7 +92,7 @@ public class Demo {
         XSpreadsheetDocument myDoc = null;
         //	        XCell oCell = null;
 
-        System.out.println("Opening an empty Calc document");
+        LOGGER.log(Level.INFO, "Opening an empty Calc document");
         myDoc = openCalc(xContext);
 
 
@@ -135,7 +141,7 @@ public class Demo {
 
         XSpreadsheet xSheet=null;
 
-        System.out.println("Getting spreadsheet") ;
+        LOGGER.log(Level.INFO, "Getting spreadsheet");
         XSpreadsheets xSheets = myDoc.getSheets() ;
         XIndexAccess oIndexSheets = UnoRuntime.queryInterface(
                 XIndexAccess.class, xSheets);
@@ -143,7 +149,7 @@ public class Demo {
                 XSpreadsheet.class, oIndexSheets.getByIndex(0));
 
 
-        System.out.println("Creating the Header") ;
+        LOGGER.log(Level.INFO, "Creating the Header");
 
         insertIntoCell(1,0,"JAN",xSheet,"");
         insertIntoCell(2,0,"FEB",xSheet,"");
@@ -160,7 +166,7 @@ public class Demo {
         insertIntoCell(13,0,"SUM",xSheet,"");
 
 
-        System.out.println("Fill the lines");
+        LOGGER.log(Level.INFO, "Fill the lines");
 
         insertIntoCell(0,1,"Smith",xSheet,"");
         insertIntoCell(1,1,"42",xSheet,"V");
@@ -253,7 +259,7 @@ public class Demo {
 
         XTableChart oChart = null;
 
-        System.out.println("Insert Chart");
+        LOGGER.log(Level.INFO, "Insert Chart");
 
         XTableCharts oCharts = oSupp.getCharts();
         oCharts.addNewByName("Example", oRect, oAddr, true, true);
@@ -269,17 +275,17 @@ public class Demo {
         XChartDocument xChart = UnoRuntime.queryInterface(
                 XChartDocument.class,oInt);
         XDiagram oDiag = xChart.getDiagram();
-        System.out.println("Change Diagram to 3D");
+        LOGGER.log(Level.INFO, "Change Diagram to 3D");
         XPropertySet oCPS = UnoRuntime.queryInterface(
                 XPropertySet.class, oDiag );
         oCPS.setPropertyValue("Dim3D", Boolean.TRUE);
-        System.out.println("Change the title");
+        LOGGER.log(Level.INFO, "Change the title");
 
         XPropertySet oTPS = UnoRuntime.queryInterface(
                 XPropertySet.class, xChart.getTitle() );
         oTPS.setPropertyValue("String","The new title");
 
-        System.out.println("write test.ods");
+        LOGGER.log(Level.INFO, "write test.ods");
         XStorable store = UnoRuntime.queryInterface(XStorable.class, myDoc);
         PropertyValue[] pvs = new PropertyValue[0];
         //pvs[0] = new PropertyValue();
@@ -289,7 +295,7 @@ public class Demo {
         XCloseable close = UnoRuntime.queryInterface(XCloseable.class, myDoc);
         close.close(true);
 
-        System.out.println("done");
+        LOGGER.log(Level.INFO, "done");
     }
 
     /**
@@ -393,11 +399,11 @@ public class Demo {
     public static void main(String[] args) {
         try {
             PoolManager.withConnector(connector -> {
-                System.out.println("connector.server.key: " + connector.key);
+                LOGGER.log(Level.INFO, "connector.server.key: {0}", connector.key);
                 make(connector);
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Demo execution failed", e);
         }
     }
 }

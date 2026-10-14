@@ -1,5 +1,8 @@
 package loj.pool;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
@@ -13,6 +16,9 @@ import loj.util.LoUtil;
  * {@link TempUserDirConnector} instances.
  */
 public class PoolManager {
+
+    private static final Logger LOGGER =
+            System.getLogger(PoolManager.class.getName());
 
     /** The singleton pool instance. */
     protected static GenericObjectPool<TempUserDirConnector> pool = null;
@@ -117,6 +123,7 @@ public class PoolManager {
         } finally {
             try {
                 if (invalidate) {
+                    LOGGER.log(Level.WARNING, "Invalidating connector: {0}", connector.key);
                     targetPool.invalidateObject(connector);
                 } else {
                     targetPool.returnObject(connector);
@@ -158,16 +165,16 @@ public class PoolManager {
     }
 
     /**
-     * Dumps selected pool configuration values to standard output.
+     * Dumps selected pool configuration values to the logger at DEBUG level.
      *
      * @param config pool configuration
      */
     public static void dumpConfig(
             GenericObjectPoolConfig<TempUserDirConnector> config) {
 
-        System.out.println(config.getEvictionPolicyClassName());
-        System.out.println(config.getMinEvictableIdleTimeMillis());
-        System.out.println(config.getMaxIdle());
-        System.out.println(config.getMinIdle());
+        LOGGER.log(Level.DEBUG, "EvictionPolicyClassName: {0}", config.getEvictionPolicyClassName());
+        LOGGER.log(Level.DEBUG, "MinEvictableIdleTimeMillis: {0}", config.getMinEvictableIdleTimeMillis());
+        LOGGER.log(Level.DEBUG, "MaxIdle: {0}", config.getMaxIdle());
+        LOGGER.log(Level.DEBUG, "MinIdle: {0}", config.getMinIdle());
     }
 }

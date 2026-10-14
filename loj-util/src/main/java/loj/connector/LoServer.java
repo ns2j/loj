@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -28,6 +29,9 @@ import com.sun.star.lib.util.NativeLibraryLoader;
  * http://udk.openoffice.org/source/browse/udk/javaunohelper/com/sun/star/comp/helper/Bootstrap.java?view=markup
  */
 public class LoServer {
+
+    private static final Logger LOGGER =
+            System.getLogger(LoServer.class.getName());
 
     /** The lo server process. */
     private Process loProcess;
@@ -126,8 +130,8 @@ public class LoServer {
         // start office process
         loProcess = Runtime.getRuntime().exec(loCommand);
 
-        pipe(loProcess.getInputStream(), System.out, "CO> ");
-        pipe(loProcess.getErrorStream(), System.err, "CE> ");
+        pipe(loProcess.getInputStream(), Level.DEBUG, "CO> ");
+        pipe(loProcess.getErrorStream(), Level.WARNING, "CE> ");
     }
 
     /**
@@ -151,30 +155,31 @@ public class LoServer {
 
         try {
             if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                LOGGER.log(Level.WARNING, "Process did not terminate within 5 seconds, destroying forcibly");
                 process.destroyForcibly();
                 process.waitFor(5, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, "Interrupted while waiting for process to terminate, destroying forcibly");
             process.destroyForcibly();
             Thread.currentThread().interrupt();
         }
     }
 
-    private static void pipe(final InputStream in, final PrintStream out, final String prefix ) {
-       new Thread( "Pipe: " + prefix) {
+    private static void pipe(final InputStream in, final Level level, final String prefix) {
+       new Thread("Pipe: " + prefix) {
             @Override
             public void run() {
-                BufferedReader r = new BufferedReader(new InputStreamReader(in));
-                try {
+                try (BufferedReader r = new BufferedReader(new InputStreamReader(in))) {
                     for ( ; ; ) {
                         String s = r.readLine();
                         if (s == null) {
                             break;
                         }
-                        out.println(prefix + s);
+                        LOGGER.log(level, "{0}{1}", prefix, s);
                     }
                 } catch (java.io.IOException e) {
-                    e.printStackTrace(System.err);
+                    LOGGER.log(Level.DEBUG, "Process pipe read error", e);
                 }
             }
         }.start();

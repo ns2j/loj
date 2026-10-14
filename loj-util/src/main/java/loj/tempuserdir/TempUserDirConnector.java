@@ -1,6 +1,8 @@
 package loj.tempuserdir;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.net.MalformedURLException;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -16,6 +18,9 @@ import loj.connector.PipeConnector;
  * The pipe name is derived from the unique identifier (key) of the server.
  */
 public class TempUserDirConnector extends PipeConnector {
+
+    private static final Logger LOGGER =
+            System.getLogger(TempUserDirConnector.class.getName());
 
     /** Unique key identifying the server instance and pipe. */
     public String key;
@@ -42,8 +47,7 @@ public class TempUserDirConnector extends PipeConnector {
      */
     @Override
     public XComponentContext connect() throws IllegalArgumentException, MalformedURLException, ConnectionSetupException, BootstrapException, IOException {
-        System.out.println("key: " + key);
+        LOGGER.log(Level.DEBUG, "connect with key: {0}", key);
         return connect("uno" + key);
     }
-
 }

@@ -1,8 +1,10 @@
 package loj.tempuserdir;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,9 @@ import loj.connector.LoServer;
  * by isolating their user configuration profiles.
  */
 public class TempUserDirServer extends LoServer {
+
+    private static final Logger LOGGER =
+            System.getLogger(TempUserDirServer.class.getName());
 
     private static final int DELETE_RETRIES = 5;
     private static final long DELETE_RETRY_DELAY_MILLIS = 200L;
@@ -39,7 +44,7 @@ public class TempUserDirServer extends LoServer {
         key = UUID.randomUUID().toString();
         //String url = getTempUserDir().toURI().toURL().toString();
         String url = getTempUserDir().toURI().toURL().toString();
-        System.out.println(url);
+        LOGGER.log(Level.DEBUG, "UserInstallation URL: {0}", url);
         List<String> o = new ArrayList<>();
         o.add("--nologo");
         o.add("--nodefault");
@@ -86,15 +91,16 @@ public class TempUserDirServer extends LoServer {
                     Thread.sleep(DELETE_RETRY_DELAY_MILLIS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    System.err.println("Interrupted while deleting temporary user directory: " + f);
+                    LOGGER.log(Level.WARNING, "Interrupted while deleting temporary user directory: {0}", f);
                     break;
                 }
             }
         }
 
         if (f.exists()) {
-            System.err.println("Failed to delete temporary user directory after "
-                    + DELETE_RETRIES + " pass(es): " + f);
+            LOGGER.log(Level.WARNING,
+                    "Failed to delete temporary user directory after {0} pass(es): {1}",
+                    DELETE_RETRIES, f);
             logRemainingEntries(f);
         }
     }
@@ -114,8 +120,9 @@ public class TempUserDirServer extends LoServer {
             File[] files = f.listFiles();
             if (files == null) {
                 if (logErrors) {
-                    System.err.println("Unable to list directory for deletion: " + f
-                            + " (check permissions and whether the directory is still accessible)");
+                    LOGGER.log(Level.WARNING,
+                            "Unable to list directory for deletion: {0} (check permissions and whether the directory is still accessible)",
+                            f);
                 }
                 return;
             }
@@ -128,8 +135,8 @@ public class TempUserDirServer extends LoServer {
             Files.deleteIfExists(f.toPath());
         } catch (IOException e) {
             if (logErrors) {
-                System.err.println("Unable to delete entry: " + f + " ("
-                        + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+                LOGGER.log(Level.DEBUG, "Unable to delete entry: {0} ({1}: {2})",
+                        f, e.getClass().getSimpleName(), e.getMessage());
             }
         }
     }
@@ -144,30 +151,29 @@ public class TempUserDirServer extends LoServer {
             return;
         }
         if (!f.isDirectory()) {
-            System.err.println("  Remaining file: " + f
-                    + " (size=" + f.length() + " bytes"
-                    + ", lastModified=" + f.lastModified() + ")");
+            LOGGER.log(Level.WARNING, "  Remaining file: {0} (size={1} bytes, lastModified={2})",
+                    f, f.length(), f.lastModified());
             return;
         }
 
         File[] children = f.listFiles();
         if (children == null) {
-            System.err.println("  Unable to list remaining entries in: " + f);
+            LOGGER.log(Level.WARNING, "  Unable to list remaining entries in: {0}", f);
             return;
         }
         if (children.length == 0) {
-            System.err.println("  Directory is empty now; it may have changed during deletion: " + f);
+            LOGGER.log(Level.WARNING, "  Directory is empty now; it may have changed during deletion: {0}", f);
             return;
         }
 
-        System.err.println("  Remaining entries in " + f + ":");
+        LOGGER.log(Level.WARNING, "  Remaining entries in {0}:", f);
         for (File child : children) {
             if (child.isDirectory()) {
-                System.err.println("    directory: " + child);
+                LOGGER.log(Level.WARNING, "    directory: {0}", child);
                 logRemainingEntries(child);
             } else {
-                System.err.println("    file: " + child + " (size=" + child.length()
-                        + " bytes, lastModified=" + child.lastModified() + ")");
+                LOGGER.log(Level.WARNING, "    file: {0} (size={1} bytes, lastModified={2})",
+                        child, child.length(), child.lastModified());
             }
         }
     }
@@ -177,7 +183,7 @@ public class TempUserDirServer extends LoServer {
      */
     @Override
     public void kill() {
-        System.out.println("kill key: " + key);
+        LOGGER.log(Level.INFO, "kill key: {0}", key);
         super.kill();
         deleteDir(getTempUserDir());
     }

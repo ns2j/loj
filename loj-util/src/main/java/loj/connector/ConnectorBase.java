@@ -1,6 +1,8 @@
 package loj.connector;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.net.MalformedURLException;
 
 import com.sun.star.bridge.UnoUrlResolver;
@@ -35,6 +37,9 @@ import com.sun.star.uno.XComponentContext;
  * complaining about "no office executable found!".
  */
 public class ConnectorBase {
+
+    private static final Logger LOGGER =
+            System.getLogger(ConnectorBase.class.getName());
 
     /** The lo server. */
     protected LoServer server;
@@ -127,11 +132,11 @@ public class ConnectorBase {
                         throw new BootstrapException(ex.toString());
                     }
                     try {
-			Thread.sleep(500);
-		    } catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		    }
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        LOGGER.log(Level.DEBUG, "Interrupted while waiting for office connection", e);
+                    }
                 }
             }
         return xContext;
@@ -170,6 +175,7 @@ public class ConnectorBase {
                     }
                 } catch (Exception e) {
                     // Continue with process cleanup even if UNO termination fails.
+                    LOGGER.log(Level.DEBUG, "UNO terminate failed, continuing with process cleanup", e);
                 }
             }
         } finally {

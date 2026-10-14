@@ -1,6 +1,8 @@
 package loj.streams;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import com.sun.star.io.BufferSizeExceededException;
 import com.sun.star.io.NotConnectedException;
@@ -11,6 +13,9 @@ import com.sun.star.io.XOutputStream;
  * UNO {@link XOutputStream} interface.
  */
 public class LoOutputStream extends ByteArrayOutputStream implements XOutputStream {
+
+    private static final Logger LOGGER =
+            System.getLogger(LoOutputStream.class.getName());
 
     /**
      * Constructs a {@code LoOutputStream} with an initial buffer size of 32 KB.
@@ -32,7 +37,7 @@ public class LoOutputStream extends ByteArrayOutputStream implements XOutputStre
             this.write(values);
         }
         catch (java.io.IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Error writing bytes to output stream", e);
         }
     }
 
