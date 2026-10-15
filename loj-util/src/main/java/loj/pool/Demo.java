@@ -397,8 +397,8 @@ public class Demo {
      * @param args command-line arguments
      */
     public static void main(String[] args) {
-        try {
-            PoolManager.withConnector(connector -> {
+        try (GenericObjectPool<TempUserDirConnector> pool = PoolManager.createPool()) {
+            PoolManager.withConnector(pool, connector -> {
                 LOGGER.log(Level.INFO, "connector.server.key: {0}", connector.key);
                 make(connector);
             });

@@ -12,16 +12,16 @@ import loj.tempuserdir.TempUserDirConnector;
 import loj.util.LoUtil;
 
 /**
- * Singleton-like manager providing a shared pool of
- * {@link TempUserDirConnector} instances.
+ * Utility class providing factory methods to create and safely execute actions with
+ * {@link GenericObjectPool} instances of {@link TempUserDirConnector}.
+ * <p>
+ * Callers (such as Spring configuration beans or try-with-resources blocks) are responsible
+ * for managing the lifecycle of the created pool.
  */
 public class PoolManager {
 
     private static final Logger LOGGER =
             System.getLogger(PoolManager.class.getName());
-
-    /** The singleton pool instance. */
-    protected static GenericObjectPool<TempUserDirConnector> pool = null;
 
     /**
      * Prevents direct instantiation.
@@ -38,28 +38,18 @@ public class PoolManager {
     }
 
     /**
-     * Returns the shared connector pool.
+     * Creates a connector pool with default configuration (maxIdle = 2).
+     * The caller is responsible for closing the returned pool.
      *
-     * @return the shared connector pool
-     * @throws BootstrapException if resolving the LibreOffice executable
-     *         folder fails
+     * @return a new connector pool
+     * @throws BootstrapException if resolving the LibreOffice executable folder fails
      */
-    public static GenericObjectPool<TempUserDirConnector> getPool()
+    public static GenericObjectPool<TempUserDirConnector> createPool()
             throws BootstrapException {
-
-        synchronized (PoolManager.class) {
-            if (pool == null) {
-                GenericObjectPoolConfig<TempUserDirConnector> config =
-                        new GenericObjectPoolConfig<>();
-
-                config.setMaxIdle(2);
-                dumpConfig(config);
-
-                pool = createPool(config);
-            }
-        }
-
-        return pool;
+        GenericObjectPoolConfig<TempUserDirConnector> config =
+                new GenericObjectPoolConfig<>();
+        config.setMaxIdle(2);
+        return createPool(config);
     }
 
     /**
@@ -78,18 +68,6 @@ public class PoolManager {
         return new GenericObjectPool<>(
                 new ConnectorFactory(LoUtil.getExecFolder()),
                 config);
-    }
-
-    /**
-     * Executes an action using the shared connector pool.
-     *
-     * @param action action to execute
-     * @throws Exception if borrowing the connector or executing the action fails
-     */
-    public static void withConnector(ConnectorAction action)
-            throws Exception {
-
-        withConnector(getPool(), action);
     }
 
     /**
