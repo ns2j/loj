@@ -25,7 +25,16 @@ public class ConnectorFactory
     @Override
     public TempUserDirConnector create() throws MalformedURLException {
         TempUserDirServer server = new TempUserDirServer(execFolder);
-        return new TempUserDirConnector(server);
+        try {
+            return new TempUserDirConnector(server);
+        } catch (RuntimeException | Error e) {
+            try {
+                server.kill();
+            } catch (RuntimeException | Error cleanupFailure) {
+                e.addSuppressed(cleanupFailure);
+            }
+            throw e;
+        }
     }
 
     @Override
