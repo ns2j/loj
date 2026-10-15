@@ -4,10 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-
-
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sun.star.comp.helper.BootstrapException;
-import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.beans.PropertyValue;
@@ -63,8 +58,7 @@ public class DemoController {
         Map<String, Object> extra = null;
         if (sheetToExport != null) {
             PropertyValue[] pvs = getPropertyValueArray(Map.of("Selection", sheetToExport.getProxy()));
-            extra = new java.util.HashMap<>();
-            extra.put("FilterData", pvs);
+            extra = Map.of("FilterData", pvs);
         }
         
         doc.writeToStream(baos, "calc_pdf_Export", extra);
@@ -91,7 +85,7 @@ public class DemoController {
     @RequestMapping(value="/pdf", method=RequestMethod.GET)
     public void pdf(HttpServletResponse response) throws java.lang.Exception{
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: " + connector.key);
+            logger.info("connector.key: {}", connector.key);
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);
@@ -108,7 +102,7 @@ public class DemoController {
     @RequestMapping(value="/chart", method=RequestMethod.GET)
     public void chart(HttpServletResponse response) throws IllegalArgumentException, IOException, BootstrapException, Exception {
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: " + connector.key);
+            logger.info("connector.key: {}", connector.key);
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);
@@ -123,7 +117,7 @@ public class DemoController {
     @RequestMapping(value="/print", method=RequestMethod.GET)
     public void print(HttpServletResponse response) throws java.lang.Exception {
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: " + connector.key);
+            logger.info("connector.key: {}", connector.key);
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);
