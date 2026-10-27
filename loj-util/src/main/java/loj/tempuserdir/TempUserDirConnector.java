@@ -23,7 +23,7 @@ public class TempUserDirConnector extends PipeConnector {
             System.getLogger(TempUserDirConnector.class.getName());
 
     /** Unique key identifying the server instance and pipe. */
-    public String key;
+    private final String key;
 
     /**
      * Constructs a {@code TempUserDirConnector} for the given {@link TempUserDirServer}.
@@ -32,7 +32,16 @@ public class TempUserDirConnector extends PipeConnector {
      */
     public TempUserDirConnector(TempUserDirServer server) {
         super(server);
-        key = server.key;
+        key = server.getKey();
+    }
+
+    /**
+     * Returns the unique key identifying the server instance and pipe.
+     *
+     * @return the unique key
+     */
+    public String getKey() {
+        return key;
     }
 
     /**

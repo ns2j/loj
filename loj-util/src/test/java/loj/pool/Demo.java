@@ -399,7 +399,7 @@ public class Demo {
     public static void main(String[] args) {
         try (GenericObjectPool<TempUserDirConnector> pool = PoolManager.createPool()) {
             PoolManager.withConnector(pool, connector -> {
-                LOGGER.log(Level.INFO, "connector.server.key: {0}", connector.key);
+                LOGGER.log(Level.INFO, "connector.server.key: {0}", connector.getKey());
                 make(connector);
             });
         } catch (Exception e) {

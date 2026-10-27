@@ -371,6 +371,22 @@ doc.writeToStream(
 
 This is useful when LibreOffice is used as a document-processing backend in a server application.
 
+## Connection pooling
+
+`PoolManager` manages a pool of `TempUserDirConnector` instances backed by Apache Commons Pool 2 (`GenericObjectPool`), isolating each LibreOffice process with its own temporary user profile directory.
+
+```java
+try (GenericObjectPool<TempUserDirConnector> pool = PoolManager.createPool()) {
+    PoolManager.withConnector(pool, connector -> {
+        XComponentContext context = connector.connect();
+        // ...
+    });
+}
+```
+
+- `PoolManager.createPool()` sets `maxIdle = 2` and uses `GenericObjectPoolConfig`'s default `maxTotal = 8` (allowing up to 8 concurrent LibreOffice processes by default).
+- To customize pool limits (such as `maxTotal`, `maxIdle`, `minIdle`, or `maxWait`), pass a `GenericObjectPoolConfig<TempUserDirConnector>` to `PoolManager.createPool(config)` (as shown in `loj-sb-sample`'s `Pool` configuration).
+
 ## LibreOffice UNO quirks
 
 LibreOffice UNO has a few APIs whose values cannot always be passed directly from one method to another.
@@ -503,7 +519,7 @@ loj
 
 - Java 11 or later
 - Maven
-- LibreOffice
+- LibreOffice (process lifecycle management and integration tests have been verified on Linux)
 
 See the parent `pom.xml` for the LibreOffice API version currently used by LOJ.
 

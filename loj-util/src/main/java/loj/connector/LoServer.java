@@ -34,7 +34,10 @@ public class LoServer {
             System.getLogger(LoServer.class.getName());
 
     /** The lo server process. */
-    private Process loProcess;
+    private volatile Process loProcess;
+
+    /** Shutdown hook registered while the server process is active. */
+    private Thread shutdownHook;
 
     /** The folder of the lo installation containing the soffice executable. */
     private String  loExecFolder;
@@ -81,6 +84,16 @@ public class LoServer {
     }
 
     /**
+     * Checks whether the LibreOffice server process is currently running.
+     *
+     * @return {@code true} if the process has been started and is still alive
+     */
+    public boolean isAlive() {
+        Process process = loProcess;
+        return process != null && process.isAlive();
+    }
+
+    /**
      * Starts an lo server which uses the specified accept option.
      * 
      * The accept option can be used for two different types of connections:
@@ -102,6 +115,10 @@ public class LoServer {
      * @throws  MalformedURLException if the executable folder URL is malformed
      */
     public void start(String loAcceptOption) throws BootstrapException, IOException, MalformedURLException {
+        if (isAlive()) {
+            LOGGER.log(Level.DEBUG, "LibreOffice process is already running; skipping start");
+            return;
+        }
 
         // find office executable relative to this class's class loader
         String sOffice = System.getProperty("os.name").startsWith("Windows")? "soffice.exe": "soffice";            
@@ -129,6 +146,7 @@ public class LoServer {
 
         // start office process
         loProcess = Runtime.getRuntime().exec(loCommand);
+        registerShutdownHook();
 
         pipe(loProcess.getInputStream(), Level.DEBUG, "CO> ");
         pipe(loProcess.getErrorStream(), Level.WARNING, "CE> ");
@@ -144,6 +162,7 @@ public class LoServer {
      */
 
     public void kill() {
+        unregisterShutdownHook();
         Process process = loProcess;
         loProcess = null;
 
@@ -163,6 +182,36 @@ public class LoServer {
             LOGGER.log(Level.WARNING, "Interrupted while waiting for process to terminate, destroying forcibly");
             process.destroyForcibly();
             Thread.currentThread().interrupt();
+        }
+    }
+
+    private synchronized void registerShutdownHook() {
+        if (shutdownHook != null) {
+            return;
+        }
+        Thread hook = new Thread(() -> {
+            synchronized (LoServer.this) {
+                shutdownHook = null;
+            }
+            kill();
+        }, "LoServer-ShutdownHook");
+        try {
+            Runtime.getRuntime().addShutdownHook(hook);
+            shutdownHook = hook;
+        } catch (IllegalStateException e) {
+            LOGGER.log(Level.DEBUG, "Cannot register shutdown hook; JVM shutdown in progress", e);
+        }
+    }
+
+    private synchronized void unregisterShutdownHook() {
+        Thread hook = shutdownHook;
+        shutdownHook = null;
+        if (hook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(hook);
+            } catch (IllegalStateException e) {
+                // Shutdown is already in progress.
+            }
         }
     }
 

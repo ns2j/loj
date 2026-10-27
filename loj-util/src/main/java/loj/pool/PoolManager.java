@@ -38,7 +38,9 @@ public class PoolManager {
     }
 
     /**
-     * Creates a connector pool with default configuration (maxIdle = 2).
+     * Creates a connector pool with default configuration
+     * ({@code maxIdle = 2}, and {@code GenericObjectPoolConfig}'s default {@code maxTotal = 8}
+     * concurrent LibreOffice processes).
      * The caller is responsible for closing the returned pool.
      *
      * @return a new connector pool
@@ -101,7 +103,7 @@ public class PoolManager {
         } finally {
             try {
                 if (invalidate) {
-                    LOGGER.log(Level.WARNING, "Invalidating connector: {0}", connector.key);
+                    LOGGER.log(Level.WARNING, "Invalidating connector: {0}", connector.getKey());
                     targetPool.invalidateObject(connector);
                 } else {
                     targetPool.returnObject(connector);

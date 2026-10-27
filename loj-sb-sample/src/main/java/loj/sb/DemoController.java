@@ -69,7 +69,7 @@ public class DemoController {
     @RequestMapping(value="/", method=RequestMethod.GET)
     public void index(HttpServletResponse response) throws java.lang.Exception {
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: {}", connector.key);
+            logger.info("connector.key: {}", connector.getKey());
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);
@@ -85,7 +85,7 @@ public class DemoController {
     @RequestMapping(value="/pdf", method=RequestMethod.GET)
     public void pdf(HttpServletResponse response) throws java.lang.Exception{
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: {}", connector.key);
+            logger.info("connector.key: {}", connector.getKey());
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);
@@ -102,7 +102,7 @@ public class DemoController {
     @RequestMapping(value="/chart", method=RequestMethod.GET)
     public void chart(HttpServletResponse response) throws IllegalArgumentException, IOException, BootstrapException, Exception {
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: {}", connector.key);
+            logger.info("connector.key: {}", connector.getKey());
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);
@@ -117,7 +117,7 @@ public class DemoController {
     @RequestMapping(value="/print", method=RequestMethod.GET)
     public void print(HttpServletResponse response) throws java.lang.Exception {
         PoolManager.withConnector(pool, connector -> {
-            logger.info("connector.key: {}", connector.key);
+            logger.info("connector.key: {}", connector.getKey());
 
             XComponentContext context = connector.connect();
             Desktop desktop = new Desktop(context);

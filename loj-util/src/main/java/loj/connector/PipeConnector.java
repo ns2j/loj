@@ -18,6 +18,8 @@ import com.sun.star.uno.XComponentContext;
  */
 public class PipeConnector extends ConnectorBase {
 
+    private String pipeName;
+
     /**
      * Constructs a {@code PipeConnector} targeting the given {@link LoServer}.
      *
@@ -38,7 +40,9 @@ public class PipeConnector extends ConnectorBase {
      * @throws IOException if an I/O error occurs
      */
     public XComponentContext connect() throws IllegalArgumentException, MalformedURLException, ConnectionSetupException, BootstrapException, IOException {
-        String pipeName = "uno" + Long.toString((new Random()).nextLong() & 0x7fffffffffffffffL);
+        if (pipeName == null) {
+            pipeName = "uno" + Long.toString((new Random()).nextLong() & 0x7fffffffffffffffL);
+        }
         return connect(pipeName);
     }
     

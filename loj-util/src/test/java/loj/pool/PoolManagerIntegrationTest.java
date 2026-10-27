@@ -2,6 +2,8 @@ package loj.pool;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -10,10 +12,16 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
+import com.sun.star.bridge.UnoUrlResolver;
+import com.sun.star.comp.helper.Bootstrap;
+import com.sun.star.comp.helper.BootstrapException;
+import com.sun.star.connection.NoConnectException;
 import com.sun.star.lang.DisposedException;
 import com.sun.star.uno.XComponentContext;
 
 import loj.tempuserdir.TempUserDirConnector;
+import loj.tempuserdir.TempUserDirServer;
+import loj.util.LoUtil;
 
 /**
  * Integration tests that start real LibreOffice processes.
@@ -149,6 +157,8 @@ class PoolManagerIntegrationTest {
                     }
 
                     XComponentContext context = connector.connect();
+                    assertTrue(connector.getServer().isAlive(),
+                            "Original server process must remain alive on cycle " + iteration);
                     assertNotNull(context,
                             "UNO context should remain available on cycle " + iteration);
                     Object desktop = context.getServiceManager()
@@ -165,6 +175,64 @@ class PoolManagerIntegrationTest {
             }
         } finally {
             pool.close();
+        }
+    }
+
+    @Test
+    @EnabledIfSystemProperty(named = "loj.integrationTests", matches = "true")
+    void serverKillTerminatesOriginalProcessAfterRepeatedConnectCalls()
+            throws Exception {
+
+        Assumptions.assumeTrue(
+                System.getenv("LO_EXEC_PATH") != null
+                        || System.getProperty("lo.execFolder") != null,
+                "Set LO_EXEC_PATH or -Dlo.execFolder to the LibreOffice program directory");
+
+        TempUserDirServer server = new TempUserDirServer(LoUtil.getExecFolder());
+        TempUserDirConnector connector = new TempUserDirConnector(server);
+        String unoUrl = "uno:pipe,name=uno" + connector.getKey() + ";urp;StarOffice.ComponentContext";
+
+        try {
+            connector.connect();
+            assertTrue(server.isAlive(), "Process should be alive after first connect()");
+
+            connector.connect();
+            assertTrue(server.isAlive(), "Original process reference must remain alive after second connect()");
+
+            // Simulate fallback cleanup when UNO terminate is not called.
+            server.kill();
+            assertFalse(server.isAlive(), "Process should be terminated after server.kill()");
+
+            XComponentContext localContext = Bootstrap.createInitialComponentContext(null);
+            assertThrows(NoConnectException.class, () ->
+                    UnoUrlResolver.create(localContext).resolve(unoUrl),
+                    "Original LibreOffice process must no longer be listening after server.kill()");
+        } finally {
+            connector.disconnect();
+        }
+    }
+
+    @Test
+    @EnabledIfSystemProperty(named = "loj.integrationTests", matches = "true")
+    void connectFailsQuicklyWhenLibreOfficeProcessExitsImmediately()
+            throws Exception {
+
+        Assumptions.assumeTrue(
+                System.getenv("LO_EXEC_PATH") != null
+                        || System.getProperty("lo.execFolder") != null,
+                "Set LO_EXEC_PATH or -Dlo.execFolder to the LibreOffice program directory");
+
+        TempUserDirServer server = new TempUserDirServer(LoUtil.getExecFolder());
+        // "--version" prints the version and exits immediately without opening the UNO pipe.
+        server.setOptions(List.of("--version"));
+        TempUserDirConnector connector = new TempUserDirConnector(server);
+
+        try {
+            assertTimeoutPreemptively(Duration.ofSeconds(10), () -> {
+                assertThrows(BootstrapException.class, connector::connect);
+            });
+        } finally {
+            connector.disconnect();
         }
     }
 

@@ -72,6 +72,15 @@ public class ConnectorBase {
     }
 
     /**
+     * Returns the {@link LoServer} managed by this connector.
+     *
+     * @return the server instance
+     */
+    public LoServer getServer() {
+        return server;
+    }
+
+    /**
      * Connects to an lo server using the specified accept option and
      * connection string and returns a component context for using the
      * connection to the lo server.
@@ -126,16 +135,27 @@ public class ConnectorBase {
                     xContext = getRemoteContext(xUrlResolver);
                     break;
                 } catch ( com.sun.star.connection.NoConnectException ex ) {
+                    if (!server.isAlive()) {
+                        throw new BootstrapException(
+                                "LibreOffice process terminated before connection could be established",
+                                ex);
+                    }
                     // Wait 500 ms, then try to connect again, but do not wait
                     // longer than 5 min (= 600 * 500 ms) total:
                     if (i == 600) {
-                        throw new BootstrapException(ex.toString());
+                        throw new BootstrapException(ex.toString(), ex);
                     }
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         LOGGER.log(Level.DEBUG, "Interrupted while waiting for office connection", e);
+                        throw new BootstrapException("Interrupted while waiting for office connection", e);
+                    }
+                    if (!server.isAlive()) {
+                        throw new BootstrapException(
+                                "LibreOffice process terminated before connection could be established",
+                                ex);
                     }
                 }
             }

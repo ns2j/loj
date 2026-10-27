@@ -27,10 +27,10 @@ public class TempUserDirServer extends LoServer {
     private static final long DELETE_RETRY_DELAY_MILLIS = 200L;
 
     /** Subdirectory under the temporary directory used for UNO profiles. */
-    public String TEMP_APP_DIR = "/uno/";
+    private static final String TEMP_APP_DIR = "/uno/";
 
     /** Unique identifier for this server instance. */
-    public String key = null;
+    private final String key;
 
     /**
      * Constructs a {@code TempUserDirServer} instance with a unique temporary user profile directory.
@@ -59,6 +59,15 @@ public class TempUserDirServer extends LoServer {
         o.add("--headless");
         //}
         setOptions(o);
+    }
+
+    /**
+     * Returns the unique identifier for this server instance.
+     *
+     * @return the unique key
+     */
+    public String getKey() {
+        return key;
     }
 
     /**

@@ -93,7 +93,7 @@ public class SocketConnectorExample {
     private static void convertWithConnector(String loadUrl, String storeUrl) throws Exception, IllegalArgumentException, IOException, BootstrapException {
 
         // Create OOo server with additional -nofirststartwizard option
-        List oooOptions = LoServer.getDefaultOptions();
+        List<String> oooOptions = LoServer.getDefaultOptions();
         oooOptions.add("--nofirststartwizard");
         LoServer oooServer = new LoServer(OOO_EXEC_FOLDER, oooOptions);
 

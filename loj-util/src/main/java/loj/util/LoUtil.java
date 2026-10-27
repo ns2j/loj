@@ -21,7 +21,7 @@ public class LoUtil {
             execFolder = System.getProperty("lo.execFolder");
 
         if (execFolder == null)
-            throw new BootstrapException("execFolder is null. set env LO_EXEC_PATH or set prop lo.exceFolder");
+            throw new BootstrapException("execFolder is null. set env LO_EXEC_PATH or set prop lo.execFolder");
         return execFolder;
     }
 }

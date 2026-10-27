@@ -47,11 +47,6 @@ public class ConnectorFactory
     public void destroyObject(
             PooledObject<TempUserDirConnector> pooled) throws Exception {
         TempUserDirConnector connector = pooled.getObject();
-
-        try {
-            connector.disconnect();
-        } finally {
-            connector.key = null;
-        }
+        connector.disconnect();
     }
 }
